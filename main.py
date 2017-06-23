@@ -1,14 +1,33 @@
 import subprocess as sub
-from src.srcmain import src_main
-from datasfortest.datasconf import datas_conf
+import src.display as display
+import src.analysisdata as analy
+import src.connectedgraph as c_graph
+from sklearn.model_selection import StratifiedKFold
 
-sub.check_call('clear', shell = True)
+nodes, data_info = display.start()
 
-print("Available set of data fpr test")
-for data_set in datas_conf.keys():
-    print("\t> " + data_set)
+##
+# Set environment
+##
+G = c_graph.create_connected_geo_graph(nodes)
 
-data_key = input("Choose what data will be used for the test: ")
-nodes    = int(input("\nHow many nodes are there in your network: "))
+c_graph.create_mpi_graph_type(G)
 
-src_main(nodes, datas_conf[data_key])
+c_graph.show_geo_graph(G)
+
+X, y = analy.read_data(**data_info)
+
+##
+# Cross validation
+##
+skf = StratifiedKFold()
+command = "mpiexec -n " + str(nodes) + " python mpi.py"
+for train_index, test_index in skf.split(X, y):
+    X_train, X_test = X[train_index], X[test_index]
+    y_train, y_test = y[train_index], y[test_index]
+
+    analy.nodes_split_data(X_train, y_train, nodes)
+
+    sub.check_call(command, shell = True)
+
+sub.check_call('rm datasfornode/*.csv', shell = True)
