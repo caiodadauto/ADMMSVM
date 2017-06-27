@@ -3,6 +3,7 @@ import src.display as display
 import src.analysisdata as analy
 import src.connectedgraph as c_graph
 from sklearn.model_selection import StratifiedKFold
+from sklearn.svm import LinearSVC
 
 nodes, data_info = display.start()
 
@@ -20,7 +21,9 @@ X, y = analy.read_data(**data_info)
 ##
 # Cross validation
 ##
-skf = StratifiedKFold()
+acc = 0
+acc_svc = 0
+skf = StratifiedKFold(2)
 command = "mpiexec -n " + str(nodes) + " python mpi.py"
 for train_index, test_index in skf.split(X, y):
     X_train, X_test = X[train_index], X[test_index]
@@ -29,5 +32,14 @@ for train_index, test_index in skf.split(X, y):
     analy.nodes_split_data(X_train, y_train, nodes)
 
     sub.check_call(command, shell = True)
+
+    acc += analy.accuracy_score(X_test, y_test)
+
+    '''
+    model = LinearSVC().fit(X_train, y_train)
+    acc_svc += model.score(X_test, y_test)
+    '''
+
+print("Accuracy ", acc/2)
 
 sub.check_call('rm datasfornode/*.csv', shell = True)
