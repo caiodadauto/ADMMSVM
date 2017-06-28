@@ -19,8 +19,17 @@ z
   </g>
   <g id="axes_1">
    <g id="LineCollection_1">
-    <path clip-path="url(#p9b3ea55b14)" d="M 322.014972 388.840704 
-L 249.614615 420.367592 
+    <path clip-path="url(#p14851abede)" d="M 198.369744 141.562772 
+L 201.437536 108.472254 
+" style="fill:none;stroke:#000000;stroke-opacity:0.4;"/>
+    <path clip-path="url(#p14851abede)" d="M 198.369744 141.562772 
+L 144.914462 312.373026 
+" style="fill:none;stroke:#000000;stroke-opacity:0.4;"/>
+    <path clip-path="url(#p14851abede)" d="M 144.221001 394.553797 
+L 144.914462 312.373026 
+" style="fill:none;stroke:#000000;stroke-opacity:0.4;"/>
+    <path clip-path="url(#p14851abede)" d="M 144.914462 312.373026 
+L 201.437536 108.472254 
 " style="fill:none;stroke:#000000;stroke-opacity:0.4;"/>
    </g>
    <g id="PathCollection_1">
@@ -35,19 +44,25 @@ C -4.000923 -2.323632 -4.472136 -1.186024 -4.472136 0
 C -4.472136 1.186024 -4.000923 2.323632 -3.162278 3.162278 
 C -2.323632 4.000923 -1.186024 4.472136 0 4.472136 
 z
-" id="C0_0_7e462d03d0"/>
+" id="C0_0_6bec0791b7"/>
     </defs>
-    <g clip-path="url(#p9b3ea55b14)">
-     <use style="fill:#00ff80;stroke:#00ff80;" x="322.014972" xlink:href="#C0_0_7e462d03d0" y="388.840704"/>
+    <g clip-path="url(#p14851abede)">
+     <use style="fill:#00ff80;stroke:#00ff80;stroke-width:0.3;" x="144.914462" xlink:href="#C0_0_6bec0791b7" y="312.373026"/>
     </g>
-    <g clip-path="url(#p9b3ea55b14)">
-     <use style="fill:#0000ff;stroke:#0000ff;" x="249.614615" xlink:href="#C0_0_7e462d03d0" y="420.367592"/>
+    <g clip-path="url(#p14851abede)">
+     <use style="fill:#0000ff;stroke:#0000ff;stroke-width:0.3;" x="201.437536" xlink:href="#C0_0_6bec0791b7" y="108.472254"/>
+    </g>
+    <g clip-path="url(#p14851abede)">
+     <use style="fill:#0000ff;stroke:#0000ff;stroke-width:0.3;" x="198.369744" xlink:href="#C0_0_6bec0791b7" y="141.562772"/>
+    </g>
+    <g clip-path="url(#p14851abede)">
+     <use style="fill:#0000ff;stroke:#0000ff;stroke-width:0.3;" x="144.221001" xlink:href="#C0_0_6bec0791b7" y="394.553797"/>
     </g>
    </g>
   </g>
  </g>
  <defs>
-  <clipPath id="p9b3ea55b14">
+  <clipPath id="p14851abede">
    <rect height="443.52" width="446.4" x="72" y="69.12"/>
   </clipPath>
  </defs>

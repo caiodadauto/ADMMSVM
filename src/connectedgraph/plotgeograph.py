@@ -19,6 +19,7 @@ def show_geo_graph(graph):
     color_node        = dict(nx.single_source_shortest_path_length(graph, node_near_center))
     array_color_node  = np.array(list(color_node.values()))
 
+    plt.style.use('seaborn')
     plt.figure(figsize=(8, 8))
     nx.draw_networkx_edges(graph, node_position, nodelist=[node_near_center],alpha=0.4)
     nx.draw_networkx_nodes(graph, node_position, nodelist=color_node.keys(),

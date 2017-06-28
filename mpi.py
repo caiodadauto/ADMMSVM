@@ -81,5 +81,7 @@ for t in range(100):
     my_r = my_lambda - 0.5 * c * (my_neighborhood_size * my_v + receive_sum)
     my_q = cvx.matrix(-(np.ones(data_size) + np.dot(my_YX_inv_D, my_r)))
 
-if my_rank == 0:
-   pd.DataFrame(my_v).to_csv('SVM-ADMM-result.csv', index = None)
+    # Get information for analysis
+    if my_rank == 0 and (t + 1)%10 == 0:
+        name = "partialresults/(w,b)_partial_" + str(t + 1) + ".csv"
+        pd.DataFrame(my_v).to_csv(name, index = None)
