@@ -8,8 +8,11 @@ cvx.solvers.options['show_progress'] = False
 # Communicator for all process
 comm = MPI.COMM_WORLD
 
+# Read Params
+params = pd.read_csv('src/distributedsvm/params.csv', index_col = [0]).to_dict()['0']
+
 # Get topology from csv file
-data_graph   = pd.read_csv('geometricgraph/graph_mpi.csv')
+data_graph   = pd.read_csv('src/distributedsvm/graph/graph_mpi.csv')
 index        = data_graph.loc[data_graph['index'].notnull(), 'index'].values
 neighborhood = data_graph['neighborhood'].values
 
@@ -19,8 +22,8 @@ my_rank              = comm_graph.Get_rank()
 my_neighborhood_size = comm_graph.Get_neighbors_count(my_rank)
 
 # Get data set of that pprocessor
-my_file_data  = "datasfornode/data_" + str(my_rank) + ".csv"
-my_file_class = "datasfornode/class_" + str(my_rank) + ".csv"
+my_file_data  = "src/distributedsvm/datas/data_" + str(my_rank) + ".csv"
+my_file_class = "src/distributedsvm/datas/class_" + str(my_rank) + ".csv"
 my_data       = pd.read_csv(my_file_data).values
 my_class      = pd.read_csv(my_file_class).values.T[0]
 
@@ -33,8 +36,10 @@ dim        = my_X.shape[1]
 my_YX      = np.dot(my_Y, my_X)
 
 # Initializes parameters of method
-c             = 10
-C             = 60
+c             = params['c']
+C             = params['C']
+if my_rank == 0:
+    print("C: ", C,  "c: ", c)
 my_v          = np.full(dim, 1)
 my_lambda     = np.full(dim, 0)
 my_r          = - c * my_neighborhood_size * my_v
@@ -53,7 +58,7 @@ my_P = cvx.matrix(2 * np.dot(my_YX_inv_D, np.dot(my_X.T, my_Y)))
 
 
 # Start the algorithm
-for t in range(100):
+for t in range(params['max_iter']):
     # Figure out mu
     my_mu = np.array(cvx.solvers.qp(my_P, my_q, my_G, my_h)['x']).reshape(data_size)
 
@@ -82,6 +87,6 @@ for t in range(100):
     my_q = cvx.matrix(-(np.ones(data_size) + np.dot(my_YX_inv_D, my_r)))
 
     # Get information for analysis
-    if my_rank == 0 and (t + 1)%10 == 0:
-        name = "partialresults/(w,b)_partial_" + str(t + 1) + ".csv"
+    if my_rank == 0 and (t + 1)%5 == 0:
+        name = "src/distributedsvm/results/(w,b)_partial_" + str(t + 1) + ".csv"
         pd.DataFrame(my_v).to_csv(name, index = None)

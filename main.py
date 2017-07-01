@@ -1,59 +1,70 @@
 import numpy as np
-import subprocess as sub
+import pandas as pd
 import src.display as display
-import src.analysisdata as analy
-import src.connectedgraph as c_graph
-from sklearn.model_selection import StratifiedKFold
+import src.distributedsvm as dist
+import src.analysisdata as analysis
 from sklearn.svm import SVC
+from sklearn.svm import SVC
+from sklearn.model_selection import StratifiedKFold
+from sklearn.preprocessing import StandardScaler
 
 nodes, data_info = display.start()
+X, y             = analysis.read_data(**data_info)
+distSVM          = dist.DistSVM(nodes = nodes)
 
-##
-# Set environment
-##
-G = c_graph.create_connected_geo_graph(nodes)
-
-c_graph.create_mpi_graph_type(G)
-
-c_graph.show_geo_graph(G)
-
-X, y = analy.read_data(**data_info)
+# TODO: Grid Search?
+tests = {'C = 20' : {'C': 20,
+                    'c': 1},
+         'C = 60' : {'C': 60,
+                    'c': 100},
+         'C = 200': {'C': 200,
+                    'c': 10}
+        }
 
 ##
 # Cross validation and compare local SVM, central SVM and distributed SVM
 ##
-acc_dist    = []
-acc_local   = 0
-acc_central = 0
+risk_dist    = {'C = 20' : [],
+                'C = 60' : [],
+                'C = 200': [],
+               }
+risk_local   = 0
+risk_central = 0
 skf = StratifiedKFold()
-command = "mpiexec -n " + str(nodes) + " python mpi.py"
 for train_index, test_index in skf.split(X, y):
-    X_train, X_test = X[train_index], X[test_index]
-    y_train, y_test = y[train_index], y[test_index]
+    for test, params in tests.items():
+        distSVM.set_params(**params)
+        X_train, X_test = X[train_index], X[test_index]
+        y_train, y_test = y[train_index], y[test_index]
 
-    analy.nodes_split_data(X_train, y_train, nodes)
+        # Distributed SVM
+        distSVM.fit(X_train, y_train)
+        # TODO: same iters...
+        iters, risk = distSVM.risk_score(X_test, y_test)
+        risk_dist[test].append(risk)
+        print(risk_dist)
 
-    # Distributed SVM
-    sub.check_call(command, shell = True)
-    iter, acc = analy.accuracy_score(X_test, y_test)
-    acc_dist.append(acc)
+    # Prepar data to local SVM and central SVM
+    X_local_train = pd.read_csv('src/distributedsvm/datas/data_0.csv').values
+    y_local_train = pd.read_csv('src/distributedsvm/datas/class_0.csv').values.T[0]
+    scale         = StandardScaler().fit(X_local_train)
+    X_local_train = scale.transform(X_local_train)
+    X_local_test  = scale.transform(X_test)
+    scale         = StandardScaler().fit(X_train)
+    X_train       = scale.transform(X_train)
+    X_test        = scale.transform(X_test)
 
     # Local SVM
-    X_local_train, y_local_train = analy.get_local_data()
-    local_model                  = SVC(C = 60, kernel = 'linear', max_iter = 200).fit(X_local_train, y_local_train)
-    acc_local                   += local_model.score(X_test, y_test)
+    local_model  = SVC(C = 60, kernel = 'linear').fit(X_local_train, y_local_train)
+    risk_local  += 1 - local_model.score(X_local_test, y_test)
 
     # Central SVM
-    central_model = SVC(C = 60, kernel = 'linear', max_iter = 200).fit(X_train, y_train)
-    acc_central  += central_model.score(X_test, y_test)
-acc_dist     = np.array(acc_dist).sum(axis = 0)/3
-acc_local   /= 3
-acc_central /= 3
-print("dist ", acc_dist)
-print("local ", acc_local)
-print("central ", acc_central)
-#analy.plot_accuracy(acc_local/3, acc_central/3)
+    central_model = SVC(C = 60, kernel = 'linear').fit(X_train, y_train)
+    risk_central  += 1 - central_model.score(X_test, y_test)
 
-# Clear directories
-sub.check_call('rm partialresults/*.csv', shell = True)
-sub.check_call('rm datasfornode/*.csv', shell = True)
+for test in risk_dist.keys():
+    risk_dist[test] = np.array(risk_dist[test]).sum(axis = 0)/3
+print(risk_dist)
+risk_local   /= 3
+risk_central /= 3
+analysis.plot_risk(risk_local, risk_central, risk_dist, iters)
