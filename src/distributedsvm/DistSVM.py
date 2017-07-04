@@ -5,7 +5,7 @@ from pathlib import Path
 from .Network import Network
 
 class DistSVM(object):
-    def __init__(self, nodes, C = 60, c = 10, max_iter = 100):
+    def __init__(self, nodes, C = 60, c = 10, max_iter = 200):
         self.nodes      = nodes
         self.C          = C
         self.c          = c

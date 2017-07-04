@@ -3,8 +3,7 @@ import pandas as pd
 import src.display as display
 import src.distributedsvm as dist
 import src.analysisdata as analysis
-from sklearn.svm import SVC
-from sklearn.svm import SVC
+from sklearn.svm import LinearSVC
 from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import StandardScaler
 
@@ -12,22 +11,27 @@ nodes, data_info = display.start()
 X, y             = analysis.read_data(**data_info)
 distSVM          = dist.DistSVM(nodes = nodes)
 
-# TODO: Grid Search?
-tests = {'C = 20' : {'C': 20,
-                    'c': 1},
-         'C = 60' : {'C': 60,
-                    'c': 100},
-         'C = 200': {'C': 200,
-                    'c': 10}
+# Grid Search for distributed SVM
+tests = {"$C = 2^{-15}\;\text{e}\;$c = 1"   : {'C': 2**-15, 'c': 1},
+         "$C = 2^{-15}\;\text{e}\;$c = 10$" : {'C': 2**-15, 'c': 10},
+         "$C = 2^{-10}\;\text{e}\;$c = 1$"  : {'C': 2**-10, 'c': 1},
+         "$C = 2^{-10}\;\text{e}\;$c = 10$" : {'C': 2**-10, 'c': 10}
         }
+
+# Parameters for SVM
+params = {"C"        : [2**-15, 2**-10, 2**-5, 2],
+          "max_iter" : [200]
+         }
+
 
 ##
 # Cross validation and compare local SVM, central SVM and distributed SVM
 ##
-risk_dist    = {'C = 20' : [],
-                'C = 60' : [],
-                'C = 200': [],
-               }
+risk_dist = {"$C = 2^{-15}\;\text{e}\;$c = 1"   : [],
+             "$C = 2^{-15}\;\text{e}\;$c = 10$" : [],
+             "$C = 2^{-10}\;\text{e}\;$c = 1$"  : [],
+             "$C = 2^{-10}\;\text{e}\;$c = 10$" : []
+            }
 risk_local   = 0
 risk_central = 0
 skf = StratifiedKFold()
@@ -54,12 +58,19 @@ for train_index, test_index in skf.split(X, y):
     X_train       = scale.transform(X_train)
     X_test        = scale.transform(X_test)
 
+    # Grid Search for SVM
+    gs             = GridSearchCV(LinearSVC(), params)
+    gs.fit(X_local_train, y_local_train)
+    local_params   = gs.best_params_
+    gs.fit(X_train, y_train)
+    central_params = gs.best_params_
+
     # Local SVM
-    local_model  = SVC(C = 60, kernel = 'linear').fit(X_local_train, y_local_train)
+    local_model  = LinearSVC(**local_params).fit(X_local_train, y_local_train)
     risk_local  += 1 - local_model.score(X_local_test, y_test)
 
     # Central SVM
-    central_model = SVC(C = 60, kernel = 'linear').fit(X_train, y_train)
+    central_model = LinearSVC(**central_params).fit(X_train, y_train)
     risk_central  += 1 - central_model.score(X_test, y_test)
 
 for test in risk_dist.keys():

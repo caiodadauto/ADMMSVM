@@ -56,9 +56,9 @@ my_h = cvx.matrix(np.concatenate((zero, cte)))
 my_q = cvx.matrix(-(np.ones(data_size) + np.dot(my_YX_inv_D, my_r)))
 my_P = cvx.matrix(2 * np.dot(my_YX_inv_D, np.dot(my_X.T, my_Y)))
 
-
 # Start the algorithm
-for t in range(params['max_iter']):
+iterations = range(int(params['max_iter']))
+for t in iterations:
     # Figure out mu
     my_mu = np.array(cvx.solvers.qp(my_P, my_q, my_G, my_h)['x']).reshape(data_size)
 
