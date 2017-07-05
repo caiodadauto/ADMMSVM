@@ -11,8 +11,8 @@ class Network(object):
     def __init__(self, nodes):
         if type(nodes) == str:
             # TODO
-            print('Under construction!! Nodes = 10')
-            exit()
+            print('Under construction!!')
+            exit(0)
         else:
             self.nodes = nodes
             self.graph = self.connected_geo_graph(self.nodes)
@@ -89,12 +89,13 @@ class Network(object):
         array_color_node  = np.array(list(color_node.values()))
 
         sns.set_style('darkgrid')
-        plt.figure(figsize=(8, 8))
+        cmap = sns.cubehelix_palette(start = .5, rot = -.65, dark = .4, light = .6, as_cmap = True)
+        plt.figure(figsize = (8, 8))
         nx.draw_networkx_edges(graph, node_position, nodelist=[node_near_center],alpha=0.4)
         nx.draw_networkx_nodes(graph, node_position, nodelist=color_node.keys(),
                                node_size = 80,
                                node_color = array_color_node,
-                               cmap = plt.cm.winter_r)
+                               cmap = cmap)
 
         plt.xlim(-0.05,1.05)
         plt.ylim(-0.05,1.05)

@@ -38,8 +38,6 @@ my_YX      = np.dot(my_Y, my_X)
 # Initializes parameters of method
 c             = params['c']
 C             = params['C']
-if my_rank == 0:
-    print("C: ", C,  "c: ", c)
 my_v          = np.full(dim, 1)
 my_lambda     = np.full(dim, 0)
 my_r          = - c * my_neighborhood_size * my_v
