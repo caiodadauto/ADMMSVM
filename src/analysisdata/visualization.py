@@ -25,5 +25,5 @@ def visualization(X, y):
 
     # Plot visualization
     g = sns.pairplot(data, hue = ' ', diag_kind = 'kde', palette = 'Set2', markers = ["o", "D"], diag_kws = {'shade': True})
-    file = "datas/visualization_variance_(" + str(pca.explained_variance_ratio_.sum()) + ").svg"
+    file = "src/analysisdata/plots/visualization_variance_(" + str(pca.explained_variance_ratio_.sum()) + ").svg"
     g.savefig(file)

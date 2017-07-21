@@ -6,6 +6,7 @@ import subprocess as sub
 import matplotlib.pyplot as plt
 #from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import StratifiedKFold
+from src.distributedsvm.pathconf import datas_path, graph_path
 
 class Network(object):
     def __init__(self, nodes):
@@ -16,15 +17,14 @@ class Network(object):
         else:
             self.nodes = nodes
             self.graph = self.connected_geo_graph(self.nodes)
-            self.show_geo_graph(self.graph, 'src/distributedsvm/graph')
+            self.show_geo_graph(self.graph)
 
-    def create_graph_mpi(self, file):
+    def create_graph_mpi(self):
         index        = []
         neighborhood = []
         sum_degree   = 0
-
+        path_file    = graph_path.joinpath('graph_mpi.csv')
         node_degrees = self.graph.degree_iter()
-
         for node, degree in node_degrees:
             sum_degree += degree
             index.append(sum_degree)
@@ -34,10 +34,9 @@ class Network(object):
 
         df = pd.DataFrame({'index': pd.Series(index),
                            'neighborhood':pd.Series(neighborhood)})
+        df.to_csv(path_file, index=False)
 
-        df.to_csv(file, index=False)
-
-    def split_data(self, X, y, data_dir):
+    def split_data(self, X, y):
         node = 0
         skf  = StratifiedKFold(n_splits = self.nodes)
         for splited_index in skf.split(X, y):
@@ -45,11 +44,16 @@ class Network(object):
             new_X = pd.DataFrame(X[splited_index[1]])
             new_y = pd.DataFrame(y[splited_index[1]])
 
-            X_file = data_dir + "/data_" + str(node) + ".csv"
-            y_file = data_dir + "/class_" + str(node) + ".csv"
-            new_X.to_csv(X_file, index = False)
-            new_y.to_csv(y_file, index = False)
+            X_path = datas_path.joinpath("data_" + str(node) + ".csv")
+            y_path = datas_path.joinpath("class_" + str(node) + ".csv")
+            new_X.to_csv(X_path, index = False)
+            new_y.to_csv(y_path, index = False)
             node += 1
+
+    def clean_files(self):
+        if list(datas_path.glob('*.csv')):
+            command = "rm " + str(datas_path) + "/*.csv"
+            sub.check_call(command, shell = True)
 
     @staticmethod
     def connected_geo_graph(nodes):
@@ -71,7 +75,7 @@ class Network(object):
         return graph
 
     @staticmethod
-    def show_geo_graph(graph, image_dir):
+    def show_geo_graph(graph):
         node_position = nx.get_node_attributes(graph,'pos')
 
         # Find node near center (0.5,0.5)
@@ -100,8 +104,8 @@ class Network(object):
         plt.xlim(-0.05,1.05)
         plt.ylim(-0.05,1.05)
         plt.axis('off')
-        file = image_dir + "/graph.svg"
+        file = str(graph_path) + "/graph.svg"
         plt.savefig(file)
 
     def __del__(self):
-        sub.check_call('rm src/distributedsvm/datas/*.csv', shell = True)
+        self.clean_files()
