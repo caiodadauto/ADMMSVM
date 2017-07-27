@@ -5,71 +5,83 @@ import pandas as pd
 import seaborn as sns
 import  matplotlib.pyplot as plt
 
-def plot_planes(X, y, local_model, central_model, dist_model):
-    xx       = np.linspace(-4, 4)
+def draw_plane(w, b, color, alpha, line_width, label = None):
+    m  = -w[0]/w[1]
+    d  = -b/w[1]
+    xx = np.linspace(-4, 4)
+    yy = m * xx + d
+    plt.plot(xx, yy, lw = line_width, c = color, label = label, alpha = alpha)
+
+def plot_planes(X, y, local_model, local_model_stratified, central_model, dist_model):
+    sns.set_style('darkgrid')
 
     y = pd.DataFrame(y)
     y.loc[y[0] == -1, 0] = '#FC8D62'
-    y.loc[y[0] == 1, 0]  = 'gray'
+    y.loc[y[0] == 1, 0]  = '#66C2A5'
     y = y.values.T[0]
 
     planes = dist_model.get_all_planes()
 
-    '''
-    sns.set_style('darkgrid')
-    for i in range(len(planes)):
-        plt.figure()
-        a  = - planes[i][0][0]
-        b  = planes[i][1]
-        yy = a * xx + b
-        legend = "Iteração " + str(i + 1)
-        plt.plot(xx, yy, c = "#3498db", lw = 1.6, label = legend)
-        plt.scatter(X[:, 0], X[:, 1], marker = 'o', c = y, alpha = 0.5)
-        file = "gif/" + str(i) + ".pdf"
-        plt.legend(loc = 1)
-        plt.ylim(-2.3, 2.3)
-        plt.savefig(file)
-    '''
-    '''
-    sns.set_style('darkgrid')
     plt.figure()
-    with sns.color_palette("GnBu_d", 50):
-        for i in range(len(planes) - 1, -1, -1):
-            a  = - planes[i][0][0]
-            b  = planes[i][1]
-            yy = a * xx + b
-            plt.plot(xx, yy, lw = 0.7, alpha = 0.5)
-    plt.scatter(X[:, 0], X[:, 1], marker = 'o', c = y, alpha = 0.5)
-    plt.ylim(-2.3, 2.3)
-    plt.savefig("out.svg")
-    '''
-    plt.figure()
-    print(len(planes))
-    w  = planes[len(planes) - 1][0]
-    a  = -w[0]/w[1]
-    b  = -planes[len(planes) - 1][1]/w[1]
-    yy = a * xx + b
-    print(a)
-    print(b)
-    plt.plot(xx, yy, lw = 1.5, alpha = 0.5, c = "#37535E", label = "Distributed")
+    draw_plane(planes[-1][0],
+               planes[-1][1],
+               "#8DA0CB",
+               1,
+               1.6,
+               "SVM Distribuído")
+    draw_plane(central_model.coef_[0],
+               central_model.intercept_[0],
+               "#FFD92F",
+               1,
+               1.6,
+               "SVM Central")
+    draw_plane(local_model.coef_[0],
+               local_model.intercept_[0],
+               "#E78AC3",
+               1,
+               1.6,
+               "SVM Local")
+    draw_plane(local_model_stratified.coef_[0],
+               local_model_stratified.intercept_[0],
+               "#B3B3B3",
+               1,
+               1.6,
+               "SVM Local Estratificado")
 
-    w  = local_model.coef_[0]
-    a  = -w[0]/w[1]
-    b  = -local_model.intercept_[0]/w[1]
-    yy = a * xx + b
-    print(a)
-    print(b)
-    plt.plot(xx, yy, lw = 1.5, alpha = 0.5, c = "#A6D854", label = "Local")
-
-    w  = central_model.coef_[0]
-    a  = -w[0]/w[1]
-    b  = -central_model.intercept_[0]/w[1]
-    yy = a * xx + b
-    print(a)
-    print(b)
-    plt.plot(xx, yy, lw = 1.5, alpha = 0.5, c = "#FFD92F", label = "Central")
 
     plt.scatter(X[:, 0], X[:, 1], marker = 'o', c = y, alpha = 0.5)
     plt.legend(loc = 1)
-    #plt.ylim(-2.3, 2.3)
-    plt.savefig("out1.svg")
+    plt.ylim(-2.3, 2.3)
+    plt.savefig("src/analysisdata/plots/simple_graph_compare.svg")
+
+    ##
+    # Gradiente plot, use max_iter 50 with step 1. Initialized v with (5...5)
+    ##
+    # plt.figure()
+    # colors = sns.color_palette("hot_d", len(planes))
+    # for i in range(len(planes)):
+    #     draw_plane(planes[i][0],
+    #                planes[i][1],
+    #                colors[i],
+    #                0.6,
+    #                1,
+    #                None)
+    # plt.scatter(X[:, 0], X[:, 1], marker = 'o', c = y, alpha = 0.5)
+    # plt.ylim(-2.3, 2.3)
+    # plt.savefig("src/analysisdata/plots/gradient_simple_graph.svg")
+
+    # colors = sns.color_palette("hot_d", len(planes))
+    # for i in range(len(planes)):
+    #      plt.figure()
+    #      legend = "Iteração " + str(i + 1)
+    #      draw_plane(planes[i][0],
+    #                 planes[i][1],
+    #                 colors[i],
+    #                 1,
+    #                 1.6,
+    #                 legend)
+    #      plt.scatter(X[:, 0], X[:, 1], marker = 'o', c = y, alpha = 0.5)
+    #      file = "src/analysisdata/plots/gif/" + str(i) + ".svg"
+    #      plt.legend(loc = 2)
+    #      plt.ylim(-2.3, 2.3)
+    #      plt.savefig(file)

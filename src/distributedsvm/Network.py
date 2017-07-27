@@ -5,6 +5,7 @@ import seaborn as sns
 import subprocess as sub
 import matplotlib.pyplot as plt
 #from sklearn.preprocessing import StandardScaler
+from sklearn.model_selection import KFold
 from sklearn.model_selection import StratifiedKFold
 from src.distributedsvm.pathconf import datas_path, graph_path
 
@@ -36,9 +37,12 @@ class Network(object):
                            'neighborhood':pd.Series(neighborhood)})
         df.to_csv(path_file, index=False)
 
-    def split_data(self, X, y):
+    def split_data(self, X, y, stratified = False):
         node = 0
-        skf  = StratifiedKFold(n_splits = self.nodes)
+        if stratified:
+            skf  = StratifiedKFold(n_splits = self.nodes)
+        else:
+            skf  = KFold(n_splits = self.nodes, shuffle = True, random_state = 17)
         for splited_index in skf.split(X, y):
             # TODO: Scale???? How scale test????
             new_X = pd.DataFrame(X[splited_index[1]])

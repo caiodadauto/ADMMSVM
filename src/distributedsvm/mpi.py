@@ -29,7 +29,7 @@ my_YX                = np.dot(my_Y, my_X)
 
 c                    = params['c']
 C                    = params['C']
-my_v                 = np.full(dim, 0)
+my_v                 = np.full(dim, 1)
 my_lambda            = np.full(dim, 0)
 my_r                 = - c * my_neighborhood_size * my_v
 my_inv_diag_D        = np.concatenate((np.full(dim - 1, 1/(1 + c * my_neighborhood_size)), np.full(1, 1/(c * my_neighborhood_size))))

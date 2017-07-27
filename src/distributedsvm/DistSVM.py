@@ -64,8 +64,8 @@ class DistSVM(object):
                                      index = ['C', 'c', 'max_iter', 'step'])
         params.to_csv(params_path)
 
-    def fit(self, X, y):
-        self.network.split_data(X, y)
+    def fit(self, X, y, stratified = False):
+        self.network.split_data(X, y, stratified)
         command = "mpiexec -n " + str(self.nodes) + " python " + str(mpi_path)
         sub.check_call(command, shell = True)
 
