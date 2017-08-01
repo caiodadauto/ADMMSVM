@@ -28,30 +28,30 @@ def plot_planes(X, y, local_model, local_model_stratified, central_model, dist_m
                "#8DA0CB",
                1,
                1.6,
-               "SVM Distribuído")
+               "SVM Distribuído com C = " + str(dist_model.C) + " e " + "c = " + str(dist_model.c))
     draw_plane(central_model.coef_[0],
                central_model.intercept_[0],
                "#FFD92F",
                1,
                1.6,
-               "SVM Central")
+               "SVM Central com C = " + str(central_model.get_params()['C']))
     draw_plane(local_model.coef_[0],
                local_model.intercept_[0],
                "#E78AC3",
                1,
                1.6,
-               "SVM Local")
+               "SVM Local com C = " + str(local_model.get_params()['C']))
     draw_plane(local_model_stratified.coef_[0],
                local_model_stratified.intercept_[0],
                "#B3B3B3",
                1,
                1.6,
-               "SVM Local Estratificado")
+               "SVM Local Estratificado com C = " + str(local_model_stratified.get_params()['C']))
 
 
     plt.scatter(X[:, 0], X[:, 1], marker = 'o', c = y, alpha = 0.5)
-    plt.legend(loc = 1)
-    plt.ylim(-2.3, 2.3)
+    plt.legend(loc = 2)
+    plt.ylim(-4.8, 4.8)
     plt.savefig("src/analysisdata/plots/simple_graph_compare.svg")
 
     ##
@@ -67,7 +67,7 @@ def plot_planes(X, y, local_model, local_model_stratified, central_model, dist_m
     #                1,
     #                None)
     # plt.scatter(X[:, 0], X[:, 1], marker = 'o', c = y, alpha = 0.5)
-    # plt.ylim(-2.3, 2.3)
+    # plt.ylim(-4.8, 4.8)
     # plt.savefig("src/analysisdata/plots/gradient_simple_graph.svg")
 
     # colors = sns.color_palette("hot_d", len(planes))
@@ -83,5 +83,5 @@ def plot_planes(X, y, local_model, local_model_stratified, central_model, dist_m
     #      plt.scatter(X[:, 0], X[:, 1], marker = 'o', c = y, alpha = 0.5)
     #      file = "src/analysisdata/plots/gif/" + str(i) + ".svg"
     #      plt.legend(loc = 2)
-    #      plt.ylim(-2.3, 2.3)
+    #      plt.ylim(-4.8, 4.8)
     #      plt.savefig(file)
