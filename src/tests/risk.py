@@ -1,44 +1,52 @@
 import numpy as np
 import pandas as pd
-import src.distributedsvm as dist
-import src.analysisdata as analysis
+import analysisdata as analysis
+from pathconf import datas_path
 from sklearn.svm import LinearSVC
 from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import StandardScaler
 
-def risk(distSVM, X, y):
+def risk(dsvm, X, y):
     analysis.visualization(X, y)
 
-    tests                 = {"$C = 2^{-15}\;\;\mathrm{e}\;\;c = 1$"   : {'C': 2**-15, 'c': 1},
-                             "$C = 2^{-15}\;\;\mathrm{e}\;\;c = 10$"  : {'C': 2**-15, 'c': 10},
-                             "$C = 2^{-5}\;\;\mathrm{e}\;\;c = 1$"    : {'C': 2**-5, 'c': 1},
-                             "$C = 2^{-5}\;\;\mathrm{e}\;\;c = 10$"   : {'C': 2**-5, 'c': 10}}
+    tests = {
+            "$C = 2^{-15}\;\;\mathrm{e}\;\;c = 1$"   : {'C': 2**-15, 'c': 1},
+            "$C = 2^{-15}\;\;\mathrm{e}\;\;c = 10$"  : {'C': 2**-15, 'c': 10},
+            "$C = 2^{-5}\;\;\mathrm{e}\;\;c = 1$"    : {'C': 2**-5, 'c': 1},
+            "$C = 2^{-5}\;\;\mathrm{e}\;\;c = 10$"   : {'C': 2**-5, 'c': 10}
+            }
 
-    params_local_central = {"C"        : [2**-15, 2**-10, 2**-5, 2],
-                            "max_iter" : [400],
-                            "penalty"  : ['l1'],
-                            "dual"     : [False]}
+    params_local_central = {
+            "C"        : [2**-15, 2**-10, 2**-5, 2],
+            "max_iter" : [400],
+            "penalty"  : ['l1'],
+            "dual"     : [False]
+            }
 
 
     risk_local   = 0
     risk_central = 0
-    risk_dist    = {"$C = 2^{-15}\;\;\mathrm{e}\;\;c = 1$" : [],
-                    "$C = 2^{-15}\;\;\mathrm{e}\;\;c = 10$"  : [],
-                    "$C = 2^{-5}\;\;\mathrm{e}\;\;c = 1$" : [],
-                    "$C = 2^{-5}\;\;\mathrm{e}\;\;c = 10$"  : []}
-    skf          = StratifiedKFold()
+    risk_dist    = {
+            "$C = 2^{-15}\;\;\mathrm{e}\;\;c = 1$"   : [],
+            "$C = 2^{-15}\;\;\mathrm{e}\;\;c = 10$"  : [],
+            "$C = 2^{-5}\;\;\mathrm{e}\;\;c = 1$"    : [],
+            "$C = 2^{-5}\;\;\mathrm{e}\;\;c = 10$"   : []
+            }
+    skf = StratifiedKFold()
     for train_index, test_index in skf.split(X, y):
         X_train, X_test = X[train_index], X[test_index]
         y_train, y_test = y[train_index], y[test_index]
         for test, params in tests.items():
-            distSVM.set_params(**params)
-            distSVM.fit(X_train, y_train)
-            risk = distSVM.risk_score(X_test, y_test)
+            dsvm.set_params(**params)
+            dsvm.fit(X_train, y_train, stratified = True)
+            risk = dsvm.risk_score(X_test, y_test)
             risk_dist[test].append(risk)
 
-        X_local_train = pd.read_csv('src/distributedsvm/datas/data_0.csv').values
-        y_local_train = pd.read_csv('src/distributedsvm/datas/class_0.csv').values.T[0]
+        local_data    = str(datas_path) + "/data_0.csv"
+        local_class   = str(datas_path) + "/class_0.csv"
+        X_local_train = pd.read_csv(local_data).values
+        y_local_train = pd.read_csv(local_class).values.T[0]
         scale         = StandardScaler().fit(X_local_train)
         X_local_train = scale.transform(X_local_train)
         X_local_test  = scale.transform(X_test)
@@ -62,4 +70,4 @@ def risk(distSVM, X, y):
         risk_dist[test] = np.array(risk_dist[test]).sum(axis = 0)/3
     risk_local   /= 3
     risk_central /= 3
-    analysis.plot_risk(risk_local, risk_central, risk_dist, distSVM.get_iters())
+    analysis.plot_risk(risk_local, risk_central, risk_dist, dsvm.get_iters())

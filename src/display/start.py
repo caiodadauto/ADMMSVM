@@ -1,6 +1,6 @@
 import time
 import subprocess as sub
-from datas.datasconf import datas_conf
+from traindatas import datas_conf
 
 def start():
     delay = 3

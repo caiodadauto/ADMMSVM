@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
+from pathconf import plots_path
 from sklearn.decomposition import PCA
 #from sklearn.preprocessing import StandardScaler
 
@@ -25,5 +26,5 @@ def visualization(X, y):
 
     # Plot visualization
     g = sns.pairplot(data, hue = ' ', diag_kind = 'kde', palette = 'Set2', markers = ["o", "D"], diag_kws = {'shade': True})
-    file = "src/analysisdata/plots/visualization_variance_(" + str(pca.explained_variance_ratio_.sum()) + ").svg"
-    g.savefig(file)
+    file = str(plots_path) + "/visualization_variance_(" + str(pca.explained_variance_ratio_.sum()) + ").pdf"
+    g.savefig(file, transparent=True)
