@@ -36,14 +36,13 @@ class Network(object):
                            'neighborhood':pd.Series(neighborhood)})
         df.to_csv(path_file, index=False)
 
-    def split_data(self, X, y, stratified = False):
+    def split_data(self, X, y, stratified = True):
         node = 0
         if stratified:
             skf  = StratifiedKFold(n_splits = self.nodes)
         else:
             skf  = KFold(n_splits = self.nodes, shuffle = True, random_state = 17)
         for splited_index in skf.split(X, y):
-            # TODO: Scale???? How scale test????
             new_X = pd.DataFrame(X[splited_index[1]])
             new_y = pd.DataFrame(y[splited_index[1]])
 

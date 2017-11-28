@@ -39,8 +39,8 @@ def risk(dsvm, X, y):
         y_train, y_test = y[train_index], y[test_index]
         for test, params in tests.items():
             dsvm.set_params(**params)
-            dsvm.fit(X_train, y_train, stratified = True)
-            risk = dsvm.risk_score(X_test, y_test)
+            dsvm.fit(X_train, y_train)
+            risk = dsvm.all_iters_risk(X_test, y_test)
             risk_dist[test].append(risk)
 
         local_data    = str(datas_path) + "/data_0.csv"

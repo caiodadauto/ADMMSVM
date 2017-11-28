@@ -15,7 +15,7 @@ def draw_plane(w, b, color, alpha, line_width, line_style, label = None):
     yy = m * xx + d
     plt.plot(xx, yy, lw = line_width, ls=line_style, c = color, label = label, alpha = alpha)
 
-def plot_planes(X, y, local_model, local_model_stratified, central_model, dist_model):
+def plot_planes(X, y, local_model, central_model, dist_model):
     sns.set_style('ticks')
 
     y = pd.DataFrame(y)
@@ -23,11 +23,11 @@ def plot_planes(X, y, local_model, local_model_stratified, central_model, dist_m
     y.loc[y[0] == 1, 0]  = colors.to_hex(cm.Pastel2(1))
     y = y.values.T[0]
 
-    planes = dist_model.get_all_planes()
+    w, b = dist_model.get_best_plane()
 
     plt.figure()
-    draw_plane(planes[-1][0],
-               planes[-1][1],
+    draw_plane(w,
+               b,
                cm.tab10(0),
                1,
                2.2,
@@ -47,13 +47,13 @@ def plot_planes(X, y, local_model, local_model_stratified, central_model, dist_m
                2.2,
                '-.',
                "SVM Local com C = " + str(local_model.get_params()['C']))
-    draw_plane(local_model_stratified.coef_[0],
-               local_model_stratified.intercept_[0],
-               cm.tab10(3),
-               1,
-               2.2,
-               ':',
-               "SVM Local Estratificado com C = " + str(local_model_stratified.get_params()['C']))
+    # draw_plane(local_model_stratified.coef_[0],
+    #            local_model_stratified.intercept_[0],
+    #            cm.tab10(3),
+    #            1,
+    #            2.2,
+    #            ':',
+    #            "SVM Local Estratificado com C = " + str(local_model_stratified.get_params()['C']))
 
 
     plt.scatter(X[:, 0], X[:, 1], marker = 'o', c = y, alpha = 0.5)

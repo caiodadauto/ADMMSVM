@@ -2,6 +2,7 @@ import numpy as np
 import pandas as pd
 import subprocess as sub
 from .Network import Network
+from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import ParameterGrid
 from sklearn.model_selection import StratifiedKFold
 from pathconf import params_path, datas_path, mpi_path, results_path
@@ -42,7 +43,6 @@ class DSVM(object):
 
     def get_best_plane(self):
         file =  results_path.joinpath('(w,b)_partial_' + str(self.get_iters()[-1]) + ".csv")
-
         return self.get_plane(file)
 
     def get_all_planes(self):
@@ -69,9 +69,12 @@ class DSVM(object):
         command = "mpiexec -n " + str(self.nodes) + " python " + str(mpi_path)
         sub.check_call(command, shell = True)
 
-    def score(self, X, y, file):
+    def score(self, X, y):
+        w, b = self.get_best_plane()
+        return self.score_from_plane(X, y, w, b)
+
+    def score_from_plane(self, X, y, w, b):
         guess_true = 0
-        w, b       = self.get_plane(file)
         n_data     = X.shape[0]
         for data in range(n_data):
             f = y[data] * (np.dot(w, X[data]) + b)
@@ -80,16 +83,16 @@ class DSVM(object):
 
         return guess_true/n_data
 
-    def risk_score(self, X, y):
+    def all_iters_risk(self, X, y):
         acc      = []
-        pathlist = sorted(results_path.glob('*.csv'), key = lambda a: int(a.stem.rsplit(sep = '_')[-1]))
-        for path in pathlist:
-            acc.append(self.score(X, y, path))
+        planes   = self.get_all_planes()
+        for plane in planes:
+            acc.append(self.score_from_plane(X, y, plane[0], plane[1]))
         acc = np.array(acc)
 
         return 1 - acc
 
-    def grid_search(self, X, y, params):
+    def grid_search(self, X, y, params, stratified = True, scale = True):
         max_acc  = 0
         skf      = StratifiedKFold(n_splits = 2)
         grid     = ParameterGrid(params)
@@ -99,9 +102,12 @@ class DSVM(object):
             for train_index, test_index in skf.split(X, y):
                 X_train, X_test = X[train_index], X[test_index]
                 y_train, y_test = y[train_index], y[test_index]
-                self.fit(X_train, y_train)
-                acc += self.score(X_test, y_test,
-                                  results_path.joinpath('(w,b)_partial_' + str(self.get_iters()[-1]) + ".csv"))
+                if scale:
+                    scaler  = StandardScaler()
+                    X_train = scaler.fit_transform(X_train)
+                    X_test  = scaler.transform(X_test)
+                self.fit(X_train, y_train, stratified)
+                acc += self.score(X_test, y_test)
             acc /= 3
             if max_acc < acc:
                 best_params = param
