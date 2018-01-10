@@ -72,6 +72,6 @@ for t in iterations:
     my_r        = 2 * my_lambda - c * (my_neighborhood_size * my_v + receive_sum)
     my_q        = cvx.matrix(-(np.ones(data_size) + np.dot(my_YX_inv_D, my_r)))
 
-    if my_rank == 0 and (t + 1)%step == 0:
-        file = results_path.joinpath("(w,b)_partial_" + str(t + 1) + ".csv")
+    if (t + 1)%step == 0:
+        file = results_path.joinpath("(w,b)_partial_" + str(t + 1) + "_" + str(my_rank) + ".csv")
         pd.DataFrame(my_v).to_csv(file, index = None)

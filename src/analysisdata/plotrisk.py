@@ -26,7 +26,7 @@ def plot_risk(risk_local, risk_central, risk_dist, iters):
     plt.rc('text', usetex = True)
     plt.rc('text.latex', unicode = True)
     tests = list(risk_dist.keys())
-    with sns.color_palette("tab10", len(tests) + 2):
+    with sns.color_palette("tab20", len(tests) + 2):
         for test in tests:
             label = "SVM distribuído com " + test
             plt.plot(iters, risk_dist[test], linewidth = 2.2, label = label)

@@ -7,6 +7,19 @@ import  matplotlib.cm as cm
 import  matplotlib.pyplot as plt
 import  matplotlib.colors as colors
 from pathconf import plots_path
+def get_average_best_plane(dsvm):
+    n = dsvm.get_nodes()
+    w = []
+    b = 0
+
+    for i in range(n):
+        plane = dsvm.get_best_plane(i)
+        w.append(plane[0])
+        b += plane[1]
+    w = np.sum(np.array(w), axis = 0)/n
+    b /= n
+
+    return [w, b]
 
 def draw_plane(w, b, color, alpha, line_width, line_style, label = None):
     m  = -w[0]/w[1]
@@ -23,7 +36,7 @@ def plot_planes(X, y, local_model, central_model, dist_model):
     y.loc[y[0] == 1, 0]  = colors.to_hex(cm.Pastel2(1))
     y = y.values.T[0]
 
-    w, b = dist_model.get_best_plane()
+    w, b = get_average_best_plane(dist_model)
 
     plt.figure()
     draw_plane(w,

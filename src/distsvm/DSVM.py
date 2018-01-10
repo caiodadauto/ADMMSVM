@@ -22,13 +22,13 @@ class DSVM(object):
         params.to_csv(params_path)
 
     def get_nodes(self):
-        return self.node
+        return self.nodes
 
     def get_iters(self):
         iters    = []
-        pathlist = sorted(results_path.glob('*.csv'))
+        pathlist = sorted(results_path.glob('*_0.csv'))
         for path in pathlist:
-            iters.append(int(path.stem.rsplit(sep = '_')[-1]))
+            iters.append(int(path.stem.rsplit(sep = '_')[2]))
         iters.sort()
         return np.array(iters)
 
@@ -41,17 +41,20 @@ class DSVM(object):
 
         return [w, b]
 
-    def get_best_plane(self):
-        file =  results_path.joinpath('(w,b)_partial_' + str(self.get_iters()[-1]) + ".csv")
+    def get_best_plane(self, node):
+        file =  results_path.joinpath('(w,b)_partial_' + str(self.get_iters()[-1]) + "_" + str(node) + ".csv")
         return self.get_plane(file)
 
     def get_all_planes(self):
-        planes   = []
-        pathlist = sorted(results_path.glob('*.csv'), key = lambda a: int(a.stem.rsplit(sep = '_')[-1]))
-        for path in pathlist:
-            planes.append(self.get_plane(path))
+        planes_per_node = []
+        for node in range(self.nodes):
+            node_planes = []
+            pathlist = sorted(results_path.glob('*_' + str(node) + '.csv'), key = lambda a: int(a.stem.rsplit(sep = '_')[2]))
+            for path in pathlist:
+                node_planes.append(self.get_plane(path))
+            planes_per_node.append(node_planes)
 
-        return planes
+        return planes_per_node
 
     def set_params(self, C, c, max_iter = 400, step = 5):
         self.clean_files()
@@ -70,8 +73,11 @@ class DSVM(object):
         sub.check_call(command, shell = True)
 
     def score(self, X, y):
-        w, b = self.get_best_plane()
-        return self.score_from_plane(X, y, w, b)
+        score = 0
+        for node in range(self.nodes):
+            w, b = self.get_best_plane(node)
+            score += self.score_from_plane(X, y, w, b)
+        return score/self.nodes
 
     def score_from_plane(self, X, y, w, b):
         guess_true = 0
@@ -84,11 +90,14 @@ class DSVM(object):
         return guess_true/n_data
 
     def all_iters_risk(self, X, y):
-        acc      = []
-        planes   = self.get_all_planes()
-        for plane in planes:
-            acc.append(self.score_from_plane(X, y, plane[0], plane[1]))
-        acc = np.array(acc)
+        acc             = []
+        planes_per_node = self.get_all_planes()
+        for planes in planes_per_node:
+            node_acc = []
+            for plane in planes:
+                node_acc.append(self.score_from_plane(X, y, plane[0], plane[1]))
+            acc.append(node_acc)
+        acc = np.array(acc).sum(axis = 0)/self.nodes
 
         return 1 - acc
 
@@ -108,7 +117,7 @@ class DSVM(object):
                     X_test  = scaler.transform(X_test)
                 self.fit(X_train, y_train, stratified)
                 acc += self.score(X_test, y_test)
-            acc /= 3
+            acc /= 2
             if max_acc < acc:
                 best_params = param
                 max_acc     = acc
