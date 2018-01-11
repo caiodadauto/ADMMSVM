@@ -9,9 +9,9 @@ from pathconf import plots_path
 
 def plot(delta_iters, iters):
     sns.set_style('ticks')
-    plt.plot(iters, delta_iters, linewidth = 2, c = cm.tab20(0))
+    plt.plot(iters, delta_iters, linewidth = 2.2, c = cm.tab20(3))
     sns.despine()
-    plt.ylim(delta_iters.min()*(0.6), delta_iters.max()*(1.4))
+    plt.ylim(delta_iters.min()*(0.5), delta_iters.max()*(1.4))
 
     plt.xlabel("Iterações " + r'(l)')
     plt.ylabel(r'$\Delta^l(\bar{v})$')

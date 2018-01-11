@@ -97,4 +97,3 @@ def plane(dsvm, X, y):
 
     analysis.plot_planes(X, y, local_model, central_model, dsvm)
     analysis.plot_dispersion(dsvm)
-    analysis.plot_central_compare(dsvm, central_model)
