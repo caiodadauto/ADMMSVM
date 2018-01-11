@@ -12,5 +12,5 @@ dsvm             = distsvm.DSVM(nodes = nodes)
 X_set, y_set     = analysis.read_data(**data_info)
 X_ran, y_ran     = analysis.create_data()
 
-tests.plane(dsvm, X_ran, y_ran)
-# tests.risk(dsvm, X_set, y_set)
+# tests.plane(dsvm, X_ran, y_ran)
+tests.risk(dsvm, X_set, y_set)

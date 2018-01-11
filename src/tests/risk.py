@@ -27,7 +27,7 @@ def risk(dsvm, X, y):
             }
 
     params_local_central = {
-            "C"        : [2**-15, 2**-10, 2**-5, 2, 2**2, 2**5],
+            "C"        : [2**-5],#[2**-15, 2**-10, 2**-5, 2, 2**2, 2**5],
             "max_iter" : [400],
             "penalty"  : ['l1'],
             "dual"     : [False]
@@ -85,6 +85,8 @@ def risk(dsvm, X, y):
 
         risk_local    += (1 - local_model.score(X_local_test_scale, y_test))/3
         risk_central  += (1 - central_model.score(X_test_scale, y_test))/3
+
+        print("Final Iteration")
 
     for test in risk_dist.keys():
         risk_dist[test] = np.array(risk_dist[test]).sum(axis = 0)/3
