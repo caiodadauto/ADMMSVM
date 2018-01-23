@@ -7,13 +7,13 @@ import  matplotlib.cm as cm
 import  matplotlib.pyplot as plt
 import  matplotlib.colors as colors
 from pathconf import plots_path
-def get_average_best_plane(dsvm):
-    n = dsvm.get_nodes()
+def get_average_best_plane(ldsvm):
+    n = ldsvm.get_nodes()
     w = []
     b = 0
 
     for i in range(n):
-        plane = dsvm.get_best_plane(i)
+        plane = ldsvm.get_best_plane(i)
         w.append(plane[0])
         b += plane[1]
     w = np.sum(np.array(w), axis = 0)/n

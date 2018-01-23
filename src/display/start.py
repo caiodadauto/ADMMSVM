@@ -22,23 +22,40 @@ def start():
     sub.check_call('clear', shell = True)
 
     while(True):
-        try:
-            nodes    = int(input("How many nodes are there in your network? "))
-        except ValueError:
+        linear_or_not = input("What is the type of the classifier (linear or nonlinear): ")
+        if linear_or_not == "linear" or linear_or_not == "nonlinear":
             sub.check_call('clear', shell = True)
-            print("The number of network must be a whole number!")
+            break
+        else:
+            sub.check_call('clear', shell = True)
+            print("Choose between linear or nonlienar!")
             time.sleep(delay)
             sub.check_call('clear', shell = True)
             continue
 
-        if nodes >= 2:
-            break
-        else:
-            sub.check_call('clear', shell = True)
-            print("The network must have at least 2 nodes!")
-            time.sleep(delay)
-            sub.check_call('clear', shell = True)
+    if linear_or_not == "linear":
+        while(True):
+            try:
+                nodes    = int(input("How many nodes are there in your network? "))
+            except ValueError:
+                sub.check_call('clear', shell = True)
+                print("The number of network must be a positive whole number!")
+                time.sleep(delay)
+                sub.check_call('clear', shell = True)
+                continue
+
+            if nodes >= 2:
+                break
+            else:
+                sub.check_call('clear', shell = True)
+                print("The network must have at least 2 nodes!")
+                time.sleep(delay)
+                sub.check_call('clear', shell = True)
+    else:
+        print("For nonlinear classifier will be used 18 nodes!")
+        nodes = 18
+        time.sleep(delay)
 
     sub.check_call('clear', shell = True)
 
-    return [nodes, datas_conf[data_key]]
+    return [nodes, linear_or_not, datas_conf[data_key]]

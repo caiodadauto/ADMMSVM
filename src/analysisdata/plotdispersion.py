@@ -25,10 +25,10 @@ def metric(vectors, mean, n):
 
     return delta/n
 
-def plot_dispersion(dsvm):
-    n               = dsvm.get_nodes()
-    iters           = dsvm.get_iters()
-    planes_per_node = dsvm.get_all_planes()
+def plot_dispersion(ldsvm):
+    n               = ldsvm.get_nodes()
+    iters           = ldsvm.get_iters()
+    planes_per_node = ldsvm.get_all_planes()
 
     for i in range(n):
         for j in range(len(iters)):

@@ -1,2 +1,3 @@
-from .plane import plane
-from .risk import risk
+from .artificial import artificial
+from .real import real
+from .chess import chess

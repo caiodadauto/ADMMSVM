@@ -5,9 +5,9 @@ from .Network import Network
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import ParameterGrid
 from sklearn.model_selection import StratifiedKFold
-from pathconf import params_path, datas_path, mpi_path, results_path
+from pathconf import params_path, datas_path, linear_mpi_path, results_path
 
-class DSVM(object):
+class LDSVM(object):
     def __init__(self, nodes, C = 60, c = 10, max_iter = 400, step = 5):
         self.C        = C
         self.c        = c
@@ -69,7 +69,7 @@ class DSVM(object):
 
     def fit(self, X, y, stratified = True):
         self.network.split_data(X, y, stratified)
-        command = "mpiexec -n " + str(self.nodes) + " python " + str(mpi_path)
+        command = "mpiexec -n " + str(self.nodes) + " python " + str(linear_mpi_path)
         sub.check_call(command, shell = True)
 
     def score(self, X, y):

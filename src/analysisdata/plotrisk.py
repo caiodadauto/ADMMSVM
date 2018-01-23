@@ -26,7 +26,7 @@ def plot_risk(risk_local, risk_central, risk_dist, iters):
     plt.rc('text', usetex = True)
     plt.rc('text.latex', unicode = True)
     tests = list(risk_dist.keys())
-    with sns.color_palette("tab20", len(tests) + 2):
+    with sns.color_palette("tab10", len(tests) + 2):
         for test in tests:
             label = "SVM distribuído com " + test
             plt.plot(iters, risk_dist[test], linewidth = 2.2, label = label)
@@ -34,7 +34,7 @@ def plot_risk(risk_local, risk_central, risk_dist, iters):
         plt.plot(iters, risk_central, linewidth = 2.2, linestyle = '-.', label = 'SVM Central')
         plt.legend(loc = 'upper right')
         sns.despine()
-        plt.xlabel('Iterações')
-        plt.ylabel('Risco')
+        plt.xlabel('Iterações ' + r'$(l)$')
+        plt.ylabel('Risco Médio')
         file = str(plots_path) + "/risk_plot.pdf"
         plt.savefig(file, transparent = True)

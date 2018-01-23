@@ -13,6 +13,12 @@ datas_conf = {
             'index': 0,
             'label':{
                 -1: 0
-                } 
+                }
+            },
+        'Chess':{
+            'file': ['src/traindatas/chess/chess_data.csv', 'src/traindatas/chess/chess_class.csv'],
+            'delimiter': ',',
+            'class_split': True,
+            'header': None,
             }
         }

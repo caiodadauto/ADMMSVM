@@ -1,1 +1,2 @@
-from .DSVM import DSVM
+from .LDSVM import LDSVM
+from .NDSVM import NDSVM
