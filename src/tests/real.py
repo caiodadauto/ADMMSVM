@@ -8,7 +8,7 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import StandardScaler
 
 def real(ldsvm, X, y):
-    analysis.visualization(X, y)
+    # analysis.visualization(X, y)
 
     tests = {
             "$C = 2^{-5}\;\;\mathrm{e}\;\;c = 1$"   : {'C': 2**-5, 'c':1 },

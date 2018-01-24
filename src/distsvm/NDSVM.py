@@ -9,7 +9,7 @@ from sklearn.model_selection import StratifiedKFold
 from pathconf import params_path, datas_path, non_linear_mpi_path, results_path
 
 class NDSVM(object):
-    def __init__(self, nodes, C = 60, c = 10, gamma = 2**-5, p = 100, max_iter = 400):
+    def __init__(self, nodes, C = 60, c = 10, gamma = 2**-15, p = 100, max_iter = 400):
         self.C        = C
         self.c        = c
         self.p        = p
@@ -27,9 +27,9 @@ class NDSVM(object):
         return self.nodes
 
     def get_classifier(self, node):
-        file_alpha = results_path.joinpath('alpha_' + str(node) + ".csv")
-        file_beta  = results_path.joinpath('beta_' + str(node) + ".csv")
-        file_b     = results_path.joinpath('b_' + str(node) + ".csv")
+        file_alpha = results_path.joinpath("alpha_" + str(node) + ".csv")
+        file_beta  = results_path.joinpath("beta_" + str(node) + ".csv")
+        file_b     = results_path.joinpath("b_" + str(node) + ".csv")
         alpha      = pd.read_csv(file_alpha).values.T[0]
         beta       = pd.read_csv(file_beta).values.T[0]
         b          = pd.read_csv(file_b).values[0][0]
@@ -48,6 +48,8 @@ class NDSVM(object):
 
         self.C        = C
         self.c        = c
+        self.p        = p
+        self.gamma    = gamma
         self.max_iter = max_iter
         params        = pd.DataFrame(data  = [[self.C], [self.c], [self.gamma], [self.max_iter]],
                                      index = ['C', 'c', 'gamma', 'max_iter'])
@@ -88,9 +90,9 @@ class NDSVM(object):
 
     def local_discriminant(self, node, alpha, beta, b, x):
         X_file   = str(datas_path) + "/data_" + str(node) + ".csv"
-        X        = pd.read_csv(local_data).values
+        X        = pd.read_csv(X_file).values
         chi_file = str(datas_path) + "/chi.csv"
-        chi      = pd.read_csv(local_data).values
+        chi      = pd.read_csv(chi_file).values
 
         g = b
         n_node_data = X.shape[0]

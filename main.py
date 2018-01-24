@@ -9,10 +9,10 @@ import analysisdata as analysis
 
 nodes, linear_or_not, data_info = display.start()
 X_set, y_set = analysis.read_data(**data_info)
-if linear_or_not is "linear":
+if linear_or_not == "linear":
     ldsvm        = distsvm.LDSVM(nodes = nodes)
     X_ran, y_ran = analysis.create_data()
-    tests.artificial(ldsvm, X_ran, y_ran)
+    # tests.artificial(ldsvm, X_ran, y_ran)
     tests.real(ldsvm, X_set, y_set)
 else:
     ndsvm = distsvm.NDSVM(nodes = nodes)

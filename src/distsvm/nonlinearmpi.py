@@ -60,28 +60,29 @@ def main():
     K_chi                = K(chi, chi, gamma)
     K_Xchi               = K(my_X, chi, gamma)
 
-    Q                    = np.identity(K_chi.shape[0]) + 2 * c * my_neighborhood_size * K_chi
+    network_cte          = 2 * c * my_neighborhood_size
+    Q                    = np.identity(dim) + network_cte * K_chi
     cholesk_Q            = linalg.cho_factor(Q)
     inv_QK_chiX          = cho_solve_matrix(cholesk_Q, K_Xchi.T)
     inv_QK_chi           = cho_solve_matrix(cholesk_Q, K_chi)
-    tilde_K_X            = np.dot(K_Xchi, inv_QK_chiX)
-    tilde_K_chi          = np.dot(K_chi, inv_QK_chi)
-    tilde_K_Xchi         = np.dot(K_Xchi, inv_QK_chi)
+    tilde_K_X            = network_cte * np.dot(K_Xchi, inv_QK_chiX)
+    tilde_K_chi          = network_cte * np.dot(K_chi, inv_QK_chi)
+    tilde_K_Xchi         = network_cte * np.dot(K_Xchi, inv_QK_chi)
 
     my_tilde_omega       = np.full(dim, 1)
     my_lambda            = np.full(dim, 0)
     my_b                 = 1.
     my_zeta              = 0.
-    my_r                 = - 2 * c * my_neighborhood_size * my_tilde_omega
-    my_s                 = - 2 * c * my_neighborhood_size * my_b
+    my_r                 = - network_cte * my_tilde_omega
+    my_s                 = - network_cte * my_b
 
     I                    = np.identity(data_size)
     zero                 = np.zeros(data_size)
     cte                  = np.full(data_size, C)
     one                  = np.ones(data_size)
-    aux_P                = 1 / (2 * c * my_neighborhood_size) * np.ones((data_size, data_size))
+    aux_P                = 1 / network_cte * np.ones((data_size, data_size))
     aux_r_q              = np.dot(my_Y, (K_Xchi - tilde_K_Xchi))
-    aux_s_q              = 1 / (2 * c * my_neighborhood_size) * np.dot(my_Y, one)
+    aux_s_q              = 1 / network_cte * np.dot(my_Y, one)
     my_G                 = cvx.matrix(np.concatenate((-I, I)))
     my_h                 = cvx.matrix(np.concatenate((zero, cte)))
     my_q                 = cvx.matrix(-(one + np.dot(aux_r_q, my_r) + my_s * aux_s_q))
@@ -89,12 +90,13 @@ def main():
 
     iterations = range(int(params['max_iter']))
     for t in iterations:
+        print("Iteration ", t, " rank ", my_rank)
         my_mu = np.array(cvx.solvers.qp(my_P, my_q, my_G, my_h)['x']).reshape(data_size)
 
         aux_mu_omega   = np.dot((K_Xchi.T - tilde_K_Xchi.T), my_Y)
         my_tilde_omega = np.dot(aux_mu_omega, my_mu) - np.dot((K_chi - tilde_K_chi), my_r)
-        aux_b          = np.dot(np.dot(my_Y, one), my_mu) - my_s
-        my_b           = 1 / (2 * c * my_neighborhood_size) * aux_b
+        aux_b          = np.dot(my_mu, np.dot(my_Y, one)) - my_s
+        my_b           = 1 / network_cte * aux_b
 
         my_send_matrix       = []
         my_receive_matrix    = []
@@ -113,19 +115,19 @@ def main():
         my_zeta   = my_zeta + 0.5 * c * (my_neighborhood_size * my_b - b_sum)
 
         my_r      = 2 * my_lambda - c * (my_neighborhood_size * my_tilde_omega + tilde_omega_sum)
-        my_r      = 2 * my_zeta - c * (my_neighborhood_size * my_tilde_omega + b_sum)
+        my_s      = 2 * my_zeta - c * (my_neighborhood_size * my_b + b_sum)
 
         my_q      = cvx.matrix(-(one + np.dot(aux_r_q, my_r) + my_s * aux_s_q))
 
-    my_alpha      = np.dot(my_Y, my_mu)
-    my_beta       = 2 * c * my_neighborhood_size * (np.dot(inv_QK_chi, my_r) - np.dot(inv_QK_chiX, my_alpha)) - my_r
+    my_alpha   = np.dot(my_Y, my_mu)
+    my_beta    = network_cte * (np.dot(inv_QK_chi, my_r) - np.dot(inv_QK_chiX, my_alpha)) - my_r
 
     file_alpha = results_path.joinpath("alpha_" + str(my_rank) + ".csv")
     file_beta  = results_path.joinpath("beta_" + str(my_rank) + ".csv")
     file_b     = results_path.joinpath("b_" + str(my_rank) + ".csv")
     pd.DataFrame(my_alpha).to_csv(file_alpha, index = None)
     pd.DataFrame(my_beta).to_csv(file_beta, index = None)
-    pd.DataFrame([my_b]).to_csv(file_beta, index = None)
+    pd.DataFrame([my_b]).to_csv(file_b, index = None)
 
 if __name__ == "__main__":
     main()

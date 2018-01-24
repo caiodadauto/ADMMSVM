@@ -47,11 +47,11 @@ def get_risks(ndsvm, params_svm, params_dist_svm, X, y):
 
 def chess(ndsvm, X, y):
     params_dist_svm = {
-            "C"        : [2**-5, 2**-2, 1, 2**2, 2**5],#
-            "c"        : [1, 2, 5, 10],#
-            "gamma"    : [2**-5, 2**-2, 1, 2**3],
+            "C"        : [2**-5, 2**-2, 1],#
+            "c"        : [1, 2],#
+            "gamma"    : [2**-15, 2**-10],
             "p"        : [250],
-            "max_iter" : [100],
+            "max_iter" : [100]
             }
 
 

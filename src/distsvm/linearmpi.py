@@ -46,11 +46,13 @@ cte                  = np.full(data_size, C)
 my_G                 = cvx.matrix(np.concatenate((-I, I)))
 my_h                 = cvx.matrix(np.concatenate((zero, cte)))
 my_q                 = cvx.matrix(-(np.ones(data_size) + np.dot(my_YX_inv_D, my_r)))
-my_P                 = cvx.matrix(0.5 * np.dot(my_YX_inv_D, my_YX.T))
+my_P                 = cvx.matrix(np.dot(my_YX_inv_D, my_YX.T))
 
 iterations = range(int(params['max_iter']))
 step       = params['step']
 for t in iterations:
+    if my_rank == 0:
+        print(my_q)
     my_mu = np.array(cvx.solvers.qp(my_P, my_q, my_G, my_h)['x']).reshape(data_size)
 
     aux   = np.dot(my_YX.T, my_mu) - my_r
