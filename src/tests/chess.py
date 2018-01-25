@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import analysisdata as analysis
-from pathconf import datas_path
+from pathconf import datas_path, results_path, graph_path
 from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GridSearchCV
@@ -51,14 +51,14 @@ def chess(ndsvm, X, y):
             "c"        : [1, 2],#
             "gamma"    : [2**-15, 2**-10],
             "p"        : [250],
-            "max_iter" : [100]
+            "max_iter" : [200]
             }
 
 
     params_svm = {
-            "C"        : [0.1, 0.3, 0.5, 1, 2, 3, 6, 2**3],#
-            "gamma"    : [2**-5, 2**-3, 2, 2**3],
-            "max_iter" : [100]
+            "C"        : [2**-5,2**-2,2,2**2],#
+            "gamma"    : [2**-15,2**-10,2**-5,2],
+            "max_iter" : [200]
             }
 
     local_risk, central_risk, ndsvm_risk = get_risks(ndsvm, params_svm, params_dist_svm, X, y)
@@ -90,10 +90,16 @@ def chess(ndsvm, X, y):
     print("Parametros DSVM    --> ", params_dist_best)
     print("Parametros Central -->", params_central_best)
 
+    print(">-------------Estimativas para o Risco---------------------<")
+    print("Risco Local   --> ", local_risk)
+    print("Risco DSVM    --> ", ndsvm_risk)
+    print("Risco Central --> ", central_risk)
+
     ndsvm.set_params(**params_dist_best)
     ndsvm.fit(X_scale, y, bad_chess = True)
     local_model   = SVC(**params_local_best).fit(X_local_scale, y_local)
     central_model = SVC(**params_central_best).fit(X_scale, y)
 
+    command = "cp " + str(results_path) + "/*.csv " + str(graph_path)
     # analysis.plot_planes(X, y, local_model, central_model, ndsvm)
     # analysis.plot_dispersion(ndsvm)

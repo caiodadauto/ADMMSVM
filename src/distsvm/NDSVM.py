@@ -6,7 +6,7 @@ from .Network import Network
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import ParameterGrid
 from sklearn.model_selection import StratifiedKFold
-from pathconf import params_path, datas_path, non_linear_mpi_path, results_path
+from pathconf import params_path, datas_path, non_linear_mpi_path, results_path, bad_chess_path
 
 class NDSVM(object):
     def __init__(self, nodes, C = 60, c = 10, gamma = 2**-15, p = 100, max_iter = 400):
@@ -80,7 +80,7 @@ class NDSVM(object):
         if not bad_chess:
             self.network.split_data(X, y, stratified)
         else:
-            command = "cp " + str(bad_chess_path) + "/*.csv" + str(datas_path)
+            command = "cp " + str(bad_chess_path) + "/*.csv " + str(datas_path)
             sub.check_call(command, shell = True)
 
         self.create_commun_data(X)
