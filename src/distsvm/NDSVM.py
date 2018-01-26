@@ -102,7 +102,7 @@ class NDSVM(object):
         for i in range(n_chi_data):
             g += beta[i] * rbf(x, chi[i], self.gamma)
 
-        return g
+        return np.sign(g)
 
     def local_score(self, X, y, node):
         alpha, beta, b = self.get_classifier(node)
@@ -130,7 +130,7 @@ class NDSVM(object):
 
         return guess_true/n_data
 
-    def grid_search(self, X, y, params, stratified = True, scale = True):
+    def local_grid_search(self, X, y, params, node, stratified = True, scale = True):
         max_acc  = 0
         skf      = StratifiedKFold(n_splits = 2)
         grid     = ParameterGrid(params)
@@ -145,7 +145,7 @@ class NDSVM(object):
                     X_train = scaler.fit_transform(X_train)
                     X_test  = scaler.transform(X_test)
                 self.fit(X_train, y_train, stratified)
-                acc += self.mix_score(X_test, y_test)
+                acc += self.local_score(X_test, y_test, node)
             acc /= 2
             if max_acc < acc:
                 best_params = param

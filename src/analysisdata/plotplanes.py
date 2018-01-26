@@ -7,6 +7,7 @@ import  matplotlib.cm as cm
 import  matplotlib.pyplot as plt
 import  matplotlib.colors as colors
 from pathconf import plots_path
+
 def get_average_best_plane(ldsvm):
     n = ldsvm.get_nodes()
     w = []
