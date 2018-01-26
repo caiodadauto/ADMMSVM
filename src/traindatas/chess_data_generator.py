@@ -53,6 +53,6 @@ for node in range(nodes):
     frame_dy = pd.DataFrame(dy)
     file_data = 'chess/bad_chess/data_' + str(node) + '.csv'
     file_class = 'chess/bad_chess/class_' + str(node) + '.csv'
-    frame_X.to_csv(file_data, index = False)
-    frame_y.to_csv(file_class, index = False)
+    frame_dx.to_csv(file_data, index = False)
+    frame_dy.to_csv(file_class, index = False)
 

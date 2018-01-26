@@ -69,10 +69,8 @@ def chess(ndsvm, X, y):
     # print("Parametros DSVM    --> ", params_dist_best)
     # print("Parametros Central -->", params_central_best)
 
-    params_dist_best = params_dist_svm
-
-    ndsvm.set_params(**params_dist_best)
-    ndsvm.fit(X_scale, y, bad_chess = True)
+    ndsvm.set_params(C=1,c=1,gamma=0.7,p=250, max_iter=400)
+    ndsvm.fit(X_scale, y, bad_chess = False)
     # central_model = SVC(**params_central_best).fit(X_scale, y)
 
     # command = "cp " + str(results_path) + "/*.csv " + str(graph_path)
