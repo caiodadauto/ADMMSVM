@@ -4,3 +4,4 @@ from .createdata import create_data
 from .plotplanes import plot_planes
 from .plotdispersion import plot_dispersion
 from .visualization import visualization
+from .plotnonlinearclassifier import plot_non_linear_classifier

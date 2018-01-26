@@ -77,4 +77,4 @@ def chess(ndsvm, X, y):
 
     # command = "cp " + str(results_path) + "/*.csv " + str(graph_path)
 
-    analysis.plot_non_linear_classifier(ndsvm, X, y)
+    analysis.plot_non_linear_classifier(ndsvm, 0, X, y)
