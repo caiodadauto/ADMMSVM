@@ -88,6 +88,7 @@ def main():
     my_q                 = cvx.matrix(-(one + np.dot(aux_r_q, my_r) + my_s * aux_s_q))
     my_P                 = cvx.matrix(np.dot(my_Y, np.dot((K_X - tilde_K_X + aux_P), my_Y)))
 
+    step       = params['step'] 
     iterations = range(int(params['max_iter']))
     for t in iterations:
         print("Iteration ", t, " rank ", my_rank)
@@ -119,15 +120,15 @@ def main():
 
         my_q      = cvx.matrix(-(one + np.dot(aux_r_q, my_r) + my_s * aux_s_q))
 
-    my_alpha   = np.dot(my_Y, my_mu)
-    my_beta    = network_cte * (np.dot(inv_QK_chi, my_r) - np.dot(inv_QK_chiX, my_alpha)) - my_r
-
-    file_alpha = results_path.joinpath("alpha_" + str(my_rank) + ".csv")
-    file_beta  = results_path.joinpath("beta_" + str(my_rank) + ".csv")
-    file_b     = results_path.joinpath("b_" + str(my_rank) + ".csv")
-    pd.DataFrame(my_alpha).to_csv(file_alpha, index = None)
-    pd.DataFrame(my_beta).to_csv(file_beta, index = None)
-    pd.DataFrame([my_b]).to_csv(file_b, index = None)
+        if (t + 1)%step == 0:
+            my_alpha   = np.dot(my_Y, my_mu)
+            my_beta    = network_cte * (np.dot(inv_QK_chi, my_r) - np.dot(inv_QK_chiX, my_alpha)) - my_r
+            file_alpha = results_path.joinpath("alpha_" + str(t + 1) + "_" + str(my_rank) + ".csv")
+            file_beta  = results_path.joinpath("beta_" + str(t + 1) + "_" + str(my_rank) + ".csv")
+            file_b     = results_path.joinpath("b_" + str(t + 1) + "_" + str(my_rank) + ".csv")
+            pd.DataFrame(my_alpha).to_csv(file_alpha, index = None)
+            pd.DataFrame(my_beta).to_csv(file_beta, index = None)
+            pd.DataFrame([my_b]).to_csv(file_b, index = None)
 
 if __name__ == "__main__":
     main()

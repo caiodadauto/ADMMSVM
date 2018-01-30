@@ -1,21 +1,31 @@
 import numpy as np
 import pandas as pd
 from .missdata import miss_to_mean
+from .createdata import create_data
+from  sklearn.datasets import load_breast_cancer
 
-def read_data(file, delimiter, class_split, header = 'infer', index = None, label = None):
-    data = pd.read_table(file[0], header = header, index_col = index, delimiter = delimiter)
+def read_data(file, delimiter, class_split, header = 'infer', index = None, label = None, auto_gen = False):
+    if not auto_gen:
+        data = pd.read_table(file[0], header = header, index_col = index, delimiter = delimiter)
 
-    if class_split:
-        y = pd.read_table(file[1], header = header, delimiter = delimiter, usecols = [0])
-        y = y.values.T[0]
-        X = data
+        if class_split:
+            y = pd.read_table(file[1], header = header, delimiter = delimiter, usecols = [0])
+            y = y.values.T[0]
+            X = data
+        else:
+            y = data.iloc[:, data.shape[1] - 1]
+            y = y.values
+            X = data.iloc[:, 0:(data.shape[1] - 2)]
+
+        if X.isnull().values.any():
+            X = miss_to_mean(X)
     else:
-        y = data.iloc[:, data.shape[1] - 1]
-        y = y.values
-        X = data.iloc[:, 0:(data.shape[1] - 2)]
-
-    if X.isnull().values.any():
-        X = miss_to_mean(X)
+        if file == 'cancer':
+            data = load_breast_cancer()
+            X    = data.data
+            y    = data.target
+        else:
+            X, y = create_data()
 
     if label is not None:
         for new_label, old_label in label.items():

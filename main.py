@@ -7,13 +7,17 @@ import distsvm
 import display
 import analysisdata as analysis
 
-nodes, linear_or_not, data_info = display.start()
-X_set, y_set = analysis.read_data(**data_info)
-if linear_or_not == "linear":
-    ldsvm        = distsvm.LDSVM(nodes = nodes)
-    X_ran, y_ran = analysis.create_data()
-    # tests.artificial(ldsvm, X_ran, y_ran)
-    tests.real(ldsvm, X_set, y_set)
+nodes, test_info = display.start()
+X, y = analysis.read_data(**test_info['data_info'])
+if test_info['type'] == 'linear':
+    ldsvm = distsvm.LDSVM(nodes = nodes)
+    if test_info['name'] == 'artificial':
+        tests.artificial(ldsvm, X, y)
+    else:
+        tests.real(ldsvm, X, y)
 else:
     ndsvm = distsvm.NDSVM(nodes = nodes)
-    tests.chess(ndsvm, X_set, y_set)
+    if test_info['name'] == 'artificial':
+        tests.chess(ndsvm, X, y)
+    else:
+        tests.cancer(ndsvm, X, y)

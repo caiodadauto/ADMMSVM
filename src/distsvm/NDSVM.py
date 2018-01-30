@@ -9,41 +9,56 @@ from sklearn.model_selection import StratifiedKFold
 from pathconf import params_path, datas_path, non_linear_mpi_path, results_path, bad_chess_path
 
 class NDSVM(object):
-    def __init__(self, nodes, C = 60, c = 10, gamma = 2**-15, p = 100, max_iter = 400):
+    def __init__(self, nodes, C = 60, c = 10, gamma = 2**-15, p = 100, max_iter = 400, step = 10):
         self.C        = C
         self.c        = c
         self.p        = p
         self.gamma    = gamma
         self.nodes    = nodes
         self.max_iter = max_iter
+        sel.step      = step
         self.network  = Network(self.nodes)
 
         self.network.create_graph_mpi()
-        params = pd.DataFrame(data  = [[self.C], [self.c], [self.gamma], [self.max_iter]],
-                              index = ['C', 'c', 'gamma', 'max_iter'])
+        params = pd.DataFrame(data  = [[self.C], [self.c], [self.gamma], [self.max_iter], [self.step]],
+                              index = ['C', 'c', 'gamma', 'max_iter', 'step'])
         params.to_csv(params_path)
 
     def get_nodes(self):
         return self.nodes
 
-    def get_classifier(self, node):
-        file_alpha = results_path.joinpath("alpha_" + str(node) + ".csv")
-        file_beta  = results_path.joinpath("beta_" + str(node) + ".csv")
-        file_b     = results_path.joinpath("b_" + str(node) + ".csv")
+    def get_iters(self):
+        iters    = []
+        for i in range(int(self.max_iter/self.step)):
+            iters.append(step * (i + 1))
+        return np.array(iters)
+
+    def get_local_classifier_iter(self, node, i):
+        file_alpha = results_path.joinpath("alpha_" + str(i) + "_" + str(node) + ".csv")
+        file_beta  = results_path.joinpath("beta_" + str(i) + "_" + str(node) + ".csv")
+        file_b     = results_path.joinpath("b_" + str(i) + "_" + str(node) + ".csv")
         alpha      = pd.read_csv(file_alpha).values.T[0]
         beta       = pd.read_csv(file_beta).values.T[0]
         b          = pd.read_csv(file_b).values[0][0]
 
         return [alpha, beta, b]
 
-    def get_all_classifier(self):
-        classifier_per_node = []
-        for node in range(self.nodes):
-            classifier_per_node.append(self.get_classifier(node))
+    def get_best_local_classifier(self, node):
+        iters = self.get_iters()
+        return self.get_local_classifier_iter(self, node, iters[-1])
 
-        return classifier_per_node
+    # def get_all_classifier_iter(self, i):
+    #     classifier_per_node = []
+    #     for node in range(self.nodes):
+    #         classifier_per_node.append(self.get_classifier(node, i))
+    #
+    #     return classifier_per_node
 
-    def set_params(self, C, c, gamma, p, max_iter = 400):
+    # def get_all_best_classifier(self):
+    #     iters = self.get_iters()
+    #     return self.get_all_classifier_iter(self, iters[-1])
+
+    def set_params(self, C, c, gamma, p, max_iter = 400, step = 5):
         self.clean_files()
 
         self.C        = C
@@ -51,8 +66,8 @@ class NDSVM(object):
         self.p        = p
         self.gamma    = gamma
         self.max_iter = max_iter
-        params        = pd.DataFrame(data  = [[self.C], [self.c], [self.gamma], [self.max_iter]],
-                                     index = ['C', 'c', 'gamma', 'max_iter'])
+        params        = pd.DataFrame(data  = [[self.C], [self.c], [self.gamma], [self.max_iter], [self.step]],
+                                     index = ['C', 'c', 'gamma', 'max_iter', 'step'])
         params.to_csv(params_path)
 
     def create_commun_data(self, X):
@@ -104,8 +119,19 @@ class NDSVM(object):
 
         return np.sign(g)
 
-    def local_score(self, X, y, node):
-        alpha, beta, b = self.get_classifier(node)
+    def mix_discriminant(self, x):
+        for node in range(self.nodes):
+            alpha, beta, b = self.get_best_local_classifier(node)
+            guess  = 0
+            if self.local_discriminant(node, alpha, beta, b, x) > 0:
+                guess += 1
+            else:
+                guess += -1
+
+        return np.sign(guess)
+
+    def local_score_iter(self, X, y, node, i):
+        alpha, beta, b = self.get_local_classifier_iter(node, i)
         guess_true     = 0
         n_data         = X.shape[0]
         for data in range(n_data):
@@ -114,18 +140,23 @@ class NDSVM(object):
 
         return guess_true/n_data
 
+    def local_best_score(self, X, y, node):
+        iters = self.get_iters()
+        return self.local_score_iter(self, iters[-1])
+
+    def all_local_iters_risk(self, node, X, y):
+        acc   = []
+        iters = self.get_iters()
+        for i in iters:
+            alpha, beta, b = self.get_local_classifier_iter(node, i)
+            acc.append(local_score_iter(X, y, node, i))
+        return 1 - acc
+
     def mix_score(self, X, y):
         guess_true = 0
         n_data     = X.shape[0]
         for data in range(n_data):
-            for node in range(self.nodes):
-                alpha, beta, b = self.get_classifier(node)
-                guess  = 0
-                if self.local_discriminant(node, alpha, beta, b, X[data]) > 0:
-                    guess += 1
-                else:
-                    guess += -1
-            if y[data] * guess > 0:
+            if y[data] * self.mix_discriminant(X[data]) > 0:
                 guess_true += 1
 
         return guess_true/n_data
@@ -145,7 +176,7 @@ class NDSVM(object):
                     X_train = scaler.fit_transform(X_train)
                     X_test  = scaler.transform(X_test)
                 self.fit(X_train, y_train, stratified)
-                acc += self.local_score(X_test, y_test, node)
+                acc += self.local_best_score(X_test, y_test, node)
             acc /= 2
             if max_acc < acc:
                 best_params = param
