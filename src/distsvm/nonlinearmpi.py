@@ -69,7 +69,7 @@ def main():
     tilde_K_chi          = network_cte * np.dot(K_chi, inv_QK_chi)
     tilde_K_Xchi         = network_cte * np.dot(K_Xchi, inv_QK_chi)
 
-    my_tilde_omega       = np.full(dim, 1)
+    my_tilde_omega       = np.full(dim, 5)
     my_lambda            = np.full(dim, 0)
     my_b                 = 1.
     my_zeta              = 0.

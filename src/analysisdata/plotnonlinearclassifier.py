@@ -21,7 +21,7 @@ def predict(ndsvm, node, mesh):
 
     return np.array(p)
 
-def plot_contours_scatter(model, node, xx, yy, X, y, name, dist = True, **params):
+def plot_contours_scatter(model, node, xx, yy, X, y, name, dist, **params):
     plt.figure()
 
     print("Doing predict")
@@ -39,12 +39,10 @@ def plot_contours_scatter(model, node, xx, yy, X, y, name, dist = True, **params
     plt.savefig(file, transparent = True)
 
 
-def plot_non_linear_classifier(ndsvm, local_svm, central_svm, node, X, y):
+def plot_non_linear_classifier(model, X, y, name, node = 0, dist = True):
     sns.set_style('ticks')
 
     xx, yy = make_meshgrid(X[:, 0], X[:, 1])
 
-    plot_contours_scatter(ndsvm, node, xx, yy, X, y, name = "dist_non_linear_classifier", cmap=plt.cm.coolwarm, alpha=0.82)
-    plot_contours_scatter(local_svm, node, xx, yy, X, y, name = "local_non_linear_classifier", dist = False, cmap=plt.cm.coolwarm, alpha=0.82)
-    plot_contours_scatter(central_svm, node, xx, yy, X, y, name = "central_non_linear_classifier", dist = False, cmap=plt.cm.coolwarm, alpha=0.82)
+    plot_contours_scatter(model, node, xx, yy, X, y, name, dist, cmap = plt.cm.coolwarm, alpha=0.82)
 

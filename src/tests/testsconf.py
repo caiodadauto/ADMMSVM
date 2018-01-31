@@ -35,28 +35,30 @@ tests_conf = {
                 'auto_gen': True
                 }
             },
-        'Test for the cancer data set (nonlinear).' : {
-            'get_nodes': True,
-            'type': 'nonlinear',
-            'name': 'cancer',
-            'data_info': {
-                'file': 'cancer',
-                'delimiter': None,
-                'class_split': None,
-                'auto_gen': True,
-                'label':{
-                    -1: 0
-                    }
-                }
-            },
-        'Test for the chess data set (nonlinear).' : {
+        'Test for the pima indians diabetes data set (nonlinear).' : {
             'get_nodes': False,
             'type': 'nonlinear',
-            'name': 'artificial',
+            'name': 'diabetes',
             'data_info': {
-                'file': ['src/tests/traindatas/chess/chess_data.csv', 'src/tests/traindatas/chess/chess_class.csv'],
+                'file': ['src/tests/traindatas/diabetic/pima-indians-diabetes.data'],
                 'delimiter': ',',
-                'class_split': True,
+                'class_split': False,
+                'header': None,
+                'label':{
+                    -1: 0
+                    },
+                'encode_null': 0
+                }
+            },
+        'Test for the artificial circles data set (nonlinear).' : {
+            'get_nodes': False,
+            'type': 'nonlinear',
+            'name': 'circles',
+            'data_info': {
+                'file': 'circles',
+                'delimiter': None,
+                'class_split': None,
+                'auto_gen': True
                 }
             }
         }

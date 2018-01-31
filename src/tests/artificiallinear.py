@@ -8,9 +8,9 @@ from sklearn.model_selection import GridSearchCV
 from sklearn.model_selection import StratifiedKFold
 
 def get_risks(ldsvm, params_svm, params_dist_svm, X, y):
-    local_risk            = 0
-    central_risk          = 0
-    ldsvm_risk             = 0
+    local_risk   = 0
+    central_risk = 0
+    ldsvm_risk   = 0
 
     gs     = GridSearchCV(LinearSVC(), params_svm)
     scaler = StandardScaler()
@@ -40,22 +40,22 @@ def get_risks(ldsvm, params_svm, params_dist_svm, X, y):
         local_model   = LinearSVC(**params_local_best).fit(X_local_train_scale, y_local_train)
         central_model = LinearSVC(**params_central_best).fit(X_train_scale, y_train)
 
-        ldsvm_risk    += (1 - ldsvm.score(X_test_scale, y_test))/3
+        ldsvm_risk   += (1 - ldsvm.score(X_test_scale, y_test))/3
         local_risk   += (1 - local_model.score(X_local_test_scale, y_test))/3
         central_risk += (1 - central_model.score(X_test_scale, y_test))/3
     return [local_risk, central_risk, ldsvm_risk]
 
-def artificial(ldsvm, X, y):
+def artificial_linear(ldsvm, X, y):
     params_dist_svm = {
-            "C"        : [1, 2**2, 5, 2**3, 2**4],#
-            "c"        : [5, 10, 12, 16, 18],#
+            "C"        : [1, 2**2, 5, 2**3, 2**4],
+            "c"        : [5, 10, 12, 16, 18],
             "max_iter" : [400],
             "step"     : [10]
             }
 
 
     params_svm = {
-            "C"        : [0.1, 0.3, 0.5, 1, 2, 3, 6, 2**3],#
+            "C"        : [0.1, 0.3, 0.5, 1, 2, 3, 6, 2**3],
             "max_iter" : [400],
             "penalty"  : ['l1'],
             "dual"     : [False]
@@ -63,10 +63,10 @@ def artificial(ldsvm, X, y):
 
     local_risk, central_risk, ldsvm_risk = get_risks(ldsvm, params_svm, params_dist_svm, X, y)
 
-    print(">-------------Estimativas para o Risco---------------------<")
-    print("Risco Local   --> ", local_risk)
-    print("Risco DSVM    --> ", ldsvm_risk)
-    print("Risco Central --> ", central_risk)
+    print(">-------------Best Risks from Grid Search---------------------<")
+    print("Risk Local         --> ", local_risk)
+    print("Risk LDSVM         --> ", ldsvm_risk)
+    print("Risk Central       --> ", central_risk)
 
     gs      = GridSearchCV(LinearSVC(), params_svm)
     scaler  = StandardScaler()
@@ -85,15 +85,15 @@ def artificial(ldsvm, X, y):
     gs.fit(X, y)
     params_central_best = gs.best_params_
 
-    print(">--------------------Melhores Parametros para o Conjunto Total-------------------<")
-    print("Parametros Local   --> ", params_local_best)
-    print("Parametros DSVM    --> ", params_dist_best)
-    print("Parametros Central -->", params_central_best)
-
     ldsvm.set_params(**params_dist_best)
     ldsvm.fit(X_scale, y, stratified=False)
     local_model   = LinearSVC(**params_local_best).fit(X_local_scale, y_local)
     central_model = LinearSVC(**params_central_best).fit(X_scale, y)
+
+    print(">-------------Best Parameters for Whole data Set--------------<")
+    print("Parameters Local   --> ", params_local_best)
+    print("Parameters LDSVM   --> ", params_dist_best)
+    print("Parameters Central -->", params_central_best)
 
     analysis.plot_planes(X, y, local_model, central_model, ldsvm)
     analysis.plot_dispersion(ldsvm)

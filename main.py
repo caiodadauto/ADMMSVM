@@ -12,12 +12,12 @@ X, y = analysis.read_data(**test_info['data_info'])
 if test_info['type'] == 'linear':
     ldsvm = distsvm.LDSVM(nodes = nodes)
     if test_info['name'] == 'artificial':
-        tests.artificial(ldsvm, X, y)
+        tests.artificial_linear(ldsvm, X, y)
     else:
-        tests.real(ldsvm, X, y)
+        tests.real_linear(ldsvm, X, y)
 else:
     ndsvm = distsvm.NDSVM(nodes = nodes)
     if test_info['name'] == 'artificial':
-        tests.chess(ndsvm, X, y)
+        tests.artificial_non_linear(ndsvm, X, y)
     else:
-        tests.cancer(ndsvm, X, y)
+        tests.real_non_linear(ndsvm, X, y)

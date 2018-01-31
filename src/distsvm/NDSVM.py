@@ -16,7 +16,7 @@ class NDSVM(object):
         self.gamma    = gamma
         self.nodes    = nodes
         self.max_iter = max_iter
-        sel.step      = step
+        self.step      = step
         self.network  = Network(self.nodes)
 
         self.network.create_graph_mpi()
@@ -30,7 +30,7 @@ class NDSVM(object):
     def get_iters(self):
         iters    = []
         for i in range(int(self.max_iter/self.step)):
-            iters.append(step * (i + 1))
+            iters.append(self.step * (i + 1))
         return np.array(iters)
 
     def get_local_classifier_iter(self, node, i):
@@ -66,6 +66,7 @@ class NDSVM(object):
         self.p        = p
         self.gamma    = gamma
         self.max_iter = max_iter
+        self.step     = step
         params        = pd.DataFrame(data  = [[self.C], [self.c], [self.gamma], [self.max_iter], [self.step]],
                                      index = ['C', 'c', 'gamma', 'max_iter', 'step'])
         params.to_csv(params_path)
@@ -148,8 +149,10 @@ class NDSVM(object):
         acc   = []
         iters = self.get_iters()
         for i in iters:
-            alpha, beta, b = self.get_local_classifier_iter(node, i)
-            acc.append(local_score_iter(X, y, node, i))
+            print(i)
+            acc.append(self.local_score_iter(X, y, node, i))
+        acc = np.array(acc)
+
         return 1 - acc
 
     def mix_score(self, X, y):

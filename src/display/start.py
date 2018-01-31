@@ -43,8 +43,12 @@ def start():
                 time.sleep(delay)
                 sub.check_call('clear', shell = True)
     else:
-        print("For chess test will be used 18 nodes!")
-        nodes = 18
+        if tests_conf[key]['name'] == 'circles':
+            print("For circles test will be used 4 nodes!")
+            nodes = 4
+        else
+            print("For pima indians diabetes test will be used 6 nodes!")
+            nodes = 6
         time.sleep(delay)
 
     sub.check_call('clear', shell = True)
