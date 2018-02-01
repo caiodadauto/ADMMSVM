@@ -45,7 +45,7 @@ class NDSVM(object):
 
     def get_best_local_classifier(self, node):
         iters = self.get_iters()
-        return self.get_local_classifier_iter(self, node, iters[-1])
+        return self.get_local_classifier_iter(node, iters[-1])
 
     # def get_all_classifier_iter(self, i):
     #     classifier_per_node = []
@@ -93,14 +93,8 @@ class NDSVM(object):
         chi.to_csv(datas_path.joinpath("chi.csv"), index = False)
 
     def fit(self, X, y, stratified = True, bad_chess = False):
-        if not bad_chess:
-            self.network.split_data(X, y, stratified)
-        else:
-            command = "cp " + str(bad_chess_path) + "/*.csv " + str(datas_path)
-            sub.check_call(command, shell = True)
-
+        self.network.split_data(X, y, stratified, bad_chess)
         self.create_commun_data(X)
-
         command = "mpiexec -n " + str(self.nodes) + " python " + str(non_linear_mpi_path)
         sub.check_call(command, shell = True)
 
@@ -143,7 +137,7 @@ class NDSVM(object):
 
     def local_best_score(self, X, y, node):
         iters = self.get_iters()
-        return self.local_score_iter(self, iters[-1])
+        return self.local_score_iter(X, y, node, iters[-1])
 
     def all_local_iters_risk(self, node, X, y):
         acc   = []

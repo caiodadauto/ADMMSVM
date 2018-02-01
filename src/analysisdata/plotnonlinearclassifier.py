@@ -13,7 +13,7 @@ def make_meshgrid(x, y, h = .02):
     return xx, yy
 
 def predict(ndsvm, node, mesh):
-    alpha, beta, b = ndsvm.get_best_classifier(node)
+    alpha, beta, b = ndsvm.get_best_local_classifier(node)
 
     p = []
     for i in range(mesh.shape[0]):

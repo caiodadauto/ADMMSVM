@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import analysisdata as analysis
-from pathconf import datas_path, results_path, graph_path
+from pathconf import datas_path
 from sklearn.svm import SVC
 from sklearn.preprocessing import StandardScaler
 from sklearn.model_selection import GridSearchCV
@@ -10,9 +10,9 @@ from sklearn.model_selection import StratifiedKFold
 def get_risks(ndsvm, params_svm, params_dist_svm, X, y):
     local_risk   = 0
     central_risk = 0
-    ldsvm_risk   = np.zeros(ndsvm.get_nodes())
+    ndsvm_risk   = np.zeros(ndsvm.get_nodes())
 
-    gs     = GridSearchCV(LinearSVC(), params_svm)
+    gs     = GridSearchCV(SVC(), params_svm)
     scaler = StandardScaler()
     skf    = StratifiedKFold()
     for train_index, test_index in skf.split(X, y):
@@ -33,20 +33,20 @@ def get_risks(ndsvm, params_svm, params_dist_svm, X, y):
             params_dist_best = ndsvm.local_grid_search(X_train, y_train, params_dist_svm, n)
             ndsvm.set_params(**params_dist_best)
             ndsvm.fit(X_train_scale, y_train)
-            ldsvm_risk[n] += (1 - ldsvm.local_best_score(X_test_scale, y_test, n))/3
+            ndsvm_risk[n] += (1 - ndsvm.local_best_score(X_test_scale, y_test, n))/3
 
         gs.fit(X_local_train, y_local_train)
         params_local_best = gs.best_params_
         gs.fit(X_train, y_train)
         params_central_best = gs.best_params_
 
-        local_model   = LinearSVC(**params_local_best).fit(X_local_train_scale, y_local_train)
-        central_model = LinearSVC(**params_central_best).fit(X_train_scale, y_train)
+        local_model   = SVC(**params_local_best).fit(X_local_train_scale, y_local_train)
+        central_model = SVC(**params_central_best).fit(X_train_scale, y_train)
 
         local_risk   += (1 - local_model.score(X_local_test_scale, y_test))/3
         central_risk += (1 - central_model.score(X_test_scale, y_test))/3
 
-    return [local_risk, central_risk, ldsvm_risk]
+    return [local_risk, central_risk, ndsvm_risk]
 
 def artificial_non_linear(ndsvm, X, y):
     params_dist_svm = {
@@ -71,7 +71,8 @@ def artificial_non_linear(ndsvm, X, y):
     print("Risk NDSVM         --> ", ndsvm_risk)
     print("Risk Central       --> ", central_risk)
 
-    scaler  = StandardScaler()
+    gs     = GridSearchCV(SVC(), params_svm)
+    scaler = StandardScaler()
     ndsvm.network.split_data(X, y, stratified=False)
     local_data    = str(datas_path) + "/data_0.csv"
     local_class   = str(datas_path) + "/class_0.csv"
@@ -86,7 +87,8 @@ def artificial_non_linear(ndsvm, X, y):
         print("Parameters NDSVM  node " + str(n + 1) + " --> ", params_dist_best)
         ndsvm.set_params(**params_dist_best)
         ndsvm.fit(X_scale, y)
-        analysis.plot_non_linear_classifier(ndsvm, X, y, "dist_non_linear_classifier_" + str(n), node = n)
+        analysis.plot_non_linear_classifier(ndsvm, X_scale, y,
+                "dist_non_linear_classifier_" + str(n), node = n)
 
     gs.fit(X_local, y_local)
     params_local_best = gs.best_params_
@@ -97,5 +99,7 @@ def artificial_non_linear(ndsvm, X, y):
 
     local_model   = SVC(**params_local_best).fit(X_local_scale, y_local)
     central_model = SVC(**params_central_best).fit(X_scale, y)
-    analysis.plot_non_linear_classifier(local_model, X, y, "local_non_linear_classifier", dist = False)
-    analysis.plot_non_linear_classifier(central_model, X, y, "central_non_linear_classifier", dist = False)
+    analysis.plot_non_linear_classifier(local_model, X_local_scale, y,
+            "local_non_linear_classifier", dist = False)
+    analysis.plot_non_linear_classifier(central_model, X_scale, y,
+            "central_non_linear_classifier", dist = False)

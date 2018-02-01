@@ -53,12 +53,23 @@ tests_conf = {
         'Test for the artificial circles data set (nonlinear).' : {
             'get_nodes': False,
             'type': 'nonlinear',
-            'name': 'circles',
+            'name': 'artificial',
             'data_info': {
                 'file': 'circles',
                 'delimiter': None,
                 'class_split': None,
                 'auto_gen': True
                 }
-            }
+            },
+       'Test for the chess data set (nonlinear).' : {
++            'get_nodes': False,
++            'type': 'nonlinear',
++            'name': 'artificial',
++            'data_info': {
+                 'file': 'chess',
+                 'delimiter': None,
+                 'class_split': None,
+                 'auto_gen': True
+                 }
++            }
         }

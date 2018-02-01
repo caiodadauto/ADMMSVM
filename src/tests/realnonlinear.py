@@ -9,17 +9,17 @@ from sklearn.preprocessing import StandardScaler
 
 def real_non_linear(ndsvm, X, y):
     tests = {
-            "$C = 1,\;\;c = 10,\;\;\gamma = 2^{-3}\;\;\mathrm{e}\;\;p = 50$"  : {
-                'C': 1, 'c': 10, 'gamma': 2**-3, 'p': 50, 'max_iter': 800
+            "$C = 1,\;\;c = 10,\;\;\gamma = 2^{-5}\;\;\mathrm{e}\;\;p = 10$"  : {
+                'C': 1, 'c': 10, 'gamma': 2**-5, 'p': 10, 'max_iter': 800
                 },
-            "$C = 1,\;\;c = 10,\;\;\gamma = 2^{-3}\;\;\mathrm{e}\;\;p = 300$"  : {
-                'C': 1, 'c': 10, 'gamma': 2**-3, 'p': 300, 'max_iter': 800
+            "$C = 1,\;\;c = 10,\;\;\gamma = 2^{-3}\;\;\mathrm{e}\;\;p = 10$"  : {
+                'C': 1, 'c': 10, 'gamma': 2**-3, 'p': 10, 'max_iter': 800
                 },
-            "$C = 1,\;\;c = 10,\;\;\gamma = 2^{-5}\;\;\mathrm{e}\;\;p = 50$"   : {
-                'C': 1, 'c':10, 'gamma': 2**-5, 'p': 50, 'max_iter': 800
+            "$C = 1,\;\;c = 20,\;\;\gamma = 2^{-3}\;\;\mathrm{e}\;\;p = 300$"   : {
+                'C': 1, 'c':20, 'gamma': 2**-3, 'p': 300, 'max_iter': 800
                 },
-            "$C = 1,\;\;c = 10,\;\;\gamma = 2^{-5}\;\;\mathrm{e}\;\;p = 300$"   : {
-                'C': 1, 'c':10, 'gamma': 2**-5, 'p': 300, 'max_iter': 800
+            "$C = 1,\;\;c = 20,\;\;\gamma = 2^{-5}\;\;\mathrm{e}\;\;p = 300$"   : {
+                'C': 1, 'c':20, 'gamma': 2**-5, 'p': 300, 'max_iter': 800
                 }
             }
 
@@ -35,10 +35,10 @@ def real_non_linear(ndsvm, X, y):
     risk_dist    = []
     for i in range(ndsvm.get_nodes()):
         risk_dist.append({
-            "$C = 1,\;\;c = 10,\;\;\gamma = 2^{-3}\;\;\mathrm{e}\;\;p = 50$"  : [],
-            "$C = 1,\;\;c = 10,\;\;\gamma = 2^{-3}\;\;\mathrm{e}\;\;p = 300$"  : [],
-            "$C = 1,\;\;c = 10,\;\;\gamma = 2^{-5}\;\;\mathrm{e}\;\;p = 50$"   : [],
-            "$C = 1,\;\;c = 10,\;\;\gamma = 2^{-5}\;\;\mathrm{e}\;\;p = 300$"   : []
+            "$C = 1,\;\;c = 10,\;\;\gamma = 2^{-5}\;\;\mathrm{e}\;\;p = 10$"  : [],
+            "$C = 1,\;\;c = 10,\;\;\gamma = 2^{-3}\;\;\mathrm{e}\;\;p = 10$"  : [],
+            "$C = 1,\;\;c = 20,\;\;\gamma = 2^{-3}\;\;\mathrm{e}\;\;p = 300$"   : [],
+            "$C = 1,\;\;c = 20,\;\;\gamma = 2^{-5}\;\;\mathrm{e}\;\;p = 300$"   : []
             })
 
     gs     = GridSearchCV(SVC(), params_local_central)
@@ -87,4 +87,4 @@ def real_non_linear(ndsvm, X, y):
 
         analysis.plot_risk(risk_local, risk_central, risk_dist[n], ndsvm.get_iters(),
                 name_file = 'risk_plot_' + str(n),
-                label_x = 'Iterações ' + r'$(l)$', label_y = 'Risco Local')
+                label_x = 'Iterações ' + r'$(l)$', label_y = 'Risco')

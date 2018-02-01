@@ -46,7 +46,7 @@ def start():
         if tests_conf[key]['name'] == 'circles':
             print("For circles test will be used 4 nodes!")
             nodes = 4
-        else
+        else:
             print("For pima indians diabetes test will be used 6 nodes!")
             nodes = 6
         time.sleep(delay)

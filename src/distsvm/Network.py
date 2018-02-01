@@ -36,21 +36,37 @@ class Network(object):
                            'neighborhood':pd.Series(neighborhood)})
         df.to_csv(path_file, index=False)
 
-    def split_data(self, X, y, stratified = True):
+    def split_data(self, X, y, stratified = True, bad_chess = False):
         node = 0
-        if stratified:
-            skf  = StratifiedKFold(n_splits = self.nodes)
-        else:
-            skf  = KFold(n_splits = self.nodes, shuffle = True, random_state = 17)
-        for splited_index in skf.split(X, y):
-            new_X = pd.DataFrame(X[splited_index[1]])
-            new_y = pd.DataFrame(y[splited_index[1]])
+        if bad_chess:
+            n_points = X.shape[0]
+            for node in range(self.nodes):
+                start_slice = node * 2 * n_points
+                final_slice = start_slice + 2 * n_points
+                dx = X[start_slice:final_slice]
+                dy = y[start_slice:final_slice]
 
-            X_path = datas_path.joinpath("data_" + str(node) + ".csv")
-            y_path = datas_path.joinpath("class_" + str(node) + ".csv")
-            new_X.to_csv(X_path, index = False)
-            new_y.to_csv(y_path, index = False)
-            node += 1
+                frame_dx = pd.DataFrame(dx)
+                frame_dy = pd.DataFrame(dy)
+
+                file_data  = datas_path.joinpath('data_' + str(node) + '.csv')
+                file_class = datas_path.joinpath('class_' + str(node) + '.csv')
+                frame_dx.to_csv(file_data, index = False)
+                frame_dy.to_csv(file_class, index = False)
+        else:
+            if stratified:
+                skf  = StratifiedKFold(n_splits = self.nodes)
+            else:
+                skf  = KFold(n_splits = self.nodes, shuffle = True, random_state = 17)
+            for splited_index in skf.split(X, y):
+                new_X = pd.DataFrame(X[splited_index[1]])
+                new_y = pd.DataFrame(y[splited_index[1]])
+
+                X_path = datas_path.joinpath("data_" + str(node) + ".csv")
+                y_path = datas_path.joinpath("class_" + str(node) + ".csv")
+                new_X.to_csv(X_path, index = False)
+                new_y.to_csv(y_path, index = False)
+                node += 1
 
     def clean_files(self):
         if list(datas_path.glob('*.csv')):
