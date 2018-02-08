@@ -91,7 +91,6 @@ def main():
     step       = params['step'] 
     iterations = range(int(params['max_iter']))
     for t in iterations:
-        print("Iteration ", t, " rank ", my_rank)
         my_mu = np.array(cvx.solvers.qp(my_P, my_q, my_G, my_h)['x']).reshape(data_size)
 
         aux_mu_omega   = np.dot((K_Xchi.T - tilde_K_Xchi.T), my_Y)

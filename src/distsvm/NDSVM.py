@@ -47,17 +47,6 @@ class NDSVM(object):
         iters = self.get_iters()
         return self.get_local_classifier_iter(node, iters[-1])
 
-    # def get_all_classifier_iter(self, i):
-    #     classifier_per_node = []
-    #     for node in range(self.nodes):
-    #         classifier_per_node.append(self.get_classifier(node, i))
-    #
-    #     return classifier_per_node
-
-    # def get_all_best_classifier(self):
-    #     iters = self.get_iters()
-    #     return self.get_all_classifier_iter(self, iters[-1])
-
     def set_params(self, C, c, gamma, p, max_iter = 400, step = 5):
         self.clean_files()
 
@@ -143,7 +132,6 @@ class NDSVM(object):
         acc   = []
         iters = self.get_iters()
         for i in iters:
-            print(i)
             acc.append(self.local_score_iter(X, y, node, i))
         acc = np.array(acc)
 

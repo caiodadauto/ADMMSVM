@@ -37,12 +37,11 @@ class Network(object):
         df.to_csv(path_file, index=False)
 
     def split_data(self, X, y, stratified = True, bad_chess = False):
-        node = 0
         if bad_chess:
-            n_points = X.shape[0]
+            n_points = int(X.shape[0] / self.nodes)
             for node in range(self.nodes):
-                start_slice = node * 2 * n_points
-                final_slice = start_slice + 2 * n_points
+                start_slice = node * n_points
+                final_slice = start_slice + n_points
                 dx = X[start_slice:final_slice]
                 dy = y[start_slice:final_slice]
 
@@ -54,6 +53,7 @@ class Network(object):
                 frame_dx.to_csv(file_data, index = False)
                 frame_dy.to_csv(file_class, index = False)
         else:
+            node = 0
             if stratified:
                 skf  = StratifiedKFold(n_splits = self.nodes)
             else:

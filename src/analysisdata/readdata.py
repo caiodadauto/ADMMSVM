@@ -3,8 +3,6 @@ import pandas as pd
 from .missdata import miss_to_mean
 from .createdata import create_data
 from .createchess import create_chess
-from .createcircles import create_circles
-from  sklearn.datasets import load_breast_cancer
 
 def read_data(file, delimiter, class_split, header = 'infer', index = None, label = None, auto_gen = False, encode_null = None):
     if not auto_gen:
@@ -27,9 +25,7 @@ def read_data(file, delimiter, class_split, header = 'infer', index = None, labe
 
         X = X.values
     else:
-        if file == 'circles':
-            X, y = create_circles()
-        elif file == 'chess':
+        if file == 'chess':
             X, y = create_chess()
         else:
             X, y = create_data()

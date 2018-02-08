@@ -14,7 +14,7 @@ def plot(delta_iters, iters):
     plt.ylim(delta_iters.min()*(0.5), delta_iters.max()*(1.4))
 
     plt.xlabel("Iterações " + r'(l)')
-    plt.ylabel(r'$\Delta^l(\bar{v})$')
+    plt.ylabel(r'$\Delta^l(\bar{v}^l)$')
     file = str(plots_path) + "/dispersion_graph.pdf"
     plt.savefig(file, transparent = True)
 

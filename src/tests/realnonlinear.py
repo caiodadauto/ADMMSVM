@@ -70,16 +70,11 @@ def real_non_linear(ndsvm, X, y):
         gs.fit(X_train, y_train)
         central_params = gs.best_params_
 
-        print("local -- ", local_params)
-        print("central -- ", central_params)
-
         local_model   = SVC(**local_params).fit(X_local_train_scale, y_local_train)
         central_model = SVC(**central_params).fit(X_train_scale, y_train)
 
         risk_local    += (1 - local_model.score(X_local_test_scale, y_test))/3
         risk_central  += (1 - central_model.score(X_test_scale, y_test))/3
-
-        print("Final Iteration")
 
     for n in range(ndsvm.get_nodes()):
         for test in risk_dist[n].keys():

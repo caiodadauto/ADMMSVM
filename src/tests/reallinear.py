@@ -8,8 +8,6 @@ from sklearn.model_selection import StratifiedKFold
 from sklearn.preprocessing import StandardScaler
 
 def real_linear(ldsvm, X, y):
-    # analysis.visualization(X, y)
-
     tests = {
             "$C = 2^{-5}\;\;\mathrm{e}\;\;c = 1$"   : {'C': 2**-5, 'c':1 },
             "$C = 2^{-5}\;\;\mathrm{e}\;\;c = 10$"   : {'C': 2**-5, 'c':10 },
@@ -68,9 +66,7 @@ def real_linear(ldsvm, X, y):
         risk_local    += (1 - local_model.score(X_local_test_scale, y_test))/3
         risk_central  += (1 - central_model.score(X_test_scale, y_test))/3
 
-        print("Final Iteration")
-
     for test in risk_dist.keys():
         risk_dist[test] = np.array(risk_dist[test]).sum(axis = 0)/3
     analysis.plot_risk(risk_local, risk_central, risk_dist, ldsvm.get_iters(),
-            name_file = 'risk_plot', label_x = 'Iterações' + r'$(l)$', label_y = 'Risco Médio')
+            name_file = 'risk_plot', label_x = 'Iterações ' + r'$(l)$', label_y = 'Risco Médio')

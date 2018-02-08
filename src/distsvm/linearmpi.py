@@ -51,8 +51,6 @@ my_P                 = cvx.matrix(np.dot(my_YX_inv_D, my_YX.T))
 iterations = range(int(params['max_iter']))
 step       = params['step']
 for t in iterations:
-    if my_rank == 0:
-        print(my_q)
     my_mu = np.array(cvx.solvers.qp(my_P, my_q, my_G, my_h)['x']).reshape(data_size)
 
     aux   = np.dot(my_YX.T, my_mu) - my_r

@@ -61,13 +61,6 @@ def plot_planes(X, y, local_model, central_model, dist_model):
                2.2,
                '-.',
                "SVM Local com C = " + str(local_model.get_params()['C']))
-    # draw_plane(local_model_stratified.coef_[0],
-    #            local_model_stratified.intercept_[0],
-    #            cm.tab10(3),
-    #            1,
-    #            2.2,
-    #            ':',
-    #            "SVM Local Estratificado com C = " + str(local_model_stratified.get_params()['C']))
 
 
     plt.scatter(X[:, 0], X[:, 1], marker = 'o', c = y, alpha = 0.5)

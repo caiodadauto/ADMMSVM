@@ -7,11 +7,6 @@ import seaborn as sns
 from pathconf import plots_path
 
 def plot_risk(risk_local, risk_central, risk_dist, iters, name_file, label_x, label_y):
-    df = pd.DataFrame(risk_dist)
-    df.to_csv(name_file + '_test', index=False)
-    print('central ', risk_central)
-    print('local ', risk_local)
-
     size = iters.shape[0]
 
     # Create the data

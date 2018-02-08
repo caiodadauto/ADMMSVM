@@ -24,7 +24,6 @@ def predict(ndsvm, node, mesh):
 def plot_contours_scatter(model, node, xx, yy, X, y, name, dist, **params):
     plt.figure()
 
-    print("Doing predict")
     if dist:
         z = predict(model, node, np.c_[xx.ravel(), yy.ravel()])
     else:
