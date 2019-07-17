@@ -12,9 +12,10 @@ applicable over distributed classification problem, in which the training data w
 between the node.
 
 ## Description
-The dissertation can be found [here]()(Portuguese version) and the presentation is [here]()(Portuguese version);
+The dissertation can be found [here](https://github.com/caiodadauto/Distributed-SVM/blob/master/dissertation/dissertation.pdf)(Portuguese version)
+and the presentation is [here](https://github.com/caiodadauto/Distributed-SVM/blob/master/dissertation/presentation.pdf)(Portuguese version);
 Although the dissertation there is in Portuguese, all references is on English, specially, take a look to this
-[reference](), almost whole dissertation is based in this one.
+[reference](https://dl.acm.org/citation.cfm?id=1859906), almost whole dissertation is based in this one.
 
 ## Usage
 To run this implementation, it is require the following packages,
